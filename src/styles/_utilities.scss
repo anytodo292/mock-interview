@@ -1,0 +1,172 @@
+/*
+ * Small, dependency-free utility layer.
+ *
+ * Keep this list intentionally short. Add a utility only when it is reused
+ * across screens; component-specific styling belongs in index.scss.
+ */
+
+$spaces: (
+  0: 0,
+  1: 0.25rem,
+  2: 0.5rem,
+  3: 0.75rem,
+  4: 1rem,
+  6: 1.5rem,
+  8: 2rem,
+);
+
+/* Layout */
+.u-flex {
+  display: flex;
+}
+
+.u-grid {
+  display: grid;
+}
+
+.u-block {
+  display: block;
+}
+
+.u-inline-flex {
+  display: inline-flex;
+}
+
+.u-flex-col {
+  flex-direction: column;
+}
+
+.u-flex-wrap {
+  flex-wrap: wrap;
+}
+
+.u-grow {
+  flex-grow: 1;
+}
+
+.u-items-center {
+  align-items: center;
+}
+
+.u-justify-center {
+  justify-content: center;
+}
+
+.u-justify-between {
+  justify-content: space-between;
+}
+
+.u-place-center {
+  place-items: center;
+}
+
+/* Spacing: u-gap-4, u-mt-4, u-mb-4, u-p-4, u-px-4 and u-py-4 */
+@each $name, $size in $spaces {
+  .u-gap-#{$name} {
+    gap: $size;
+  }
+
+  .u-mt-#{$name} {
+    margin-top: $size;
+  }
+
+  .u-mb-#{$name} {
+    margin-bottom: $size;
+  }
+
+  .u-p-#{$name} {
+    padding: $size;
+  }
+
+  .u-px-#{$name} {
+    padding-right: $size;
+    padding-left: $size;
+  }
+
+  .u-py-#{$name} {
+    padding-top: $size;
+    padding-bottom: $size;
+  }
+}
+
+/* Sizing */
+.u-w-full {
+  width: 100%;
+}
+
+.u-h-full {
+  height: 100%;
+}
+
+.u-min-w-0 {
+  min-width: 0;
+}
+
+.u-max-w-content {
+  max-width: 75rem;
+}
+
+/* Typography */
+.u-text-left {
+  text-align: left;
+}
+
+.u-text-center {
+  text-align: center;
+}
+
+.u-text-sm {
+  font-size: 0.875rem;
+}
+
+.u-text-lg {
+  font-size: 1.125rem;
+}
+
+.u-font-medium {
+  font-weight: 500;
+}
+
+.u-font-bold {
+  font-weight: 700;
+}
+
+.u-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Miscellaneous */
+.u-relative {
+  position: relative;
+}
+
+.u-hidden {
+  display: none;
+}
+
+.u-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 600px) {
+  .u-mobile-hidden {
+    display: none;
+  }
+
+  .u-mobile-flex-col {
+    flex-direction: column;
+  }
+
+  .u-mobile-w-full {
+    width: 100%;
+  }
+}
