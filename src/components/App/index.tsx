@@ -36,16 +36,12 @@ export default function App(): JSX.Element {
   const screenViews: Record<Screen, JSX.Element> = {
     home: <HomeScreen onStart={() => setScreen('connecting')} />,
     connecting: <ConnectingScreen onConnected={() => setScreen('live')} />,
-    live: (
-      <LiveScreen onEnd={() => setScreen('finished')} />
-    ),
-   //  thinking: (
-   //    <ThinkingScreen onContinue={() => setScreen('live')} onEnd={() => setScreen('finished')} />
-   //  ),
-    finished: (
-      <FinishedScreen onAgain={() => setScreen('home')} />
-    ),
-   //  report: <ReportScreen onAgain={() => setScreen('home')} />,
+    live: <LiveScreen onEnd={() => setScreen('finished')} />,
+    //  thinking: (
+    //    <ThinkingScreen onContinue={() => setScreen('live')} onEnd={() => setScreen('finished')} />
+    //  ),
+    finished: <FinishedScreen onAgain={() => setScreen('home')} />,
+    //  report: <ReportScreen onAgain={() => setScreen('home')} />,
   };
 
   return (

@@ -26,7 +26,7 @@ const InterviewType = {
   CULTURE_INTERVIEW: 13,
   FINAL_INTERVIEW: 14,
   AI_INTERVIEW: 15,
-}
+};
 
 const LangType = {
   CHINESE: 0,
@@ -40,17 +40,17 @@ const LangType = {
   RUSSIAN: 8,
   ARABIC: 9,
   PORTUGUESE: 10,
-  KOREAN: 11
-}
+  KOREAN: 11,
+};
 
 const DifficultyType = {
   Junior: 0,
   Mid: 1,
-  Senior: 2
-}
+  Senior: 2,
+};
 
 export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
-  const InterviewTypeList: ({id: number, text: string})[] = [
+  const InterviewTypeList: { id: number; text: string }[] = [
     { id: InterviewType.SCREENING_INTERVIEW, text: 'Screening Interview' },
     { id: InterviewType.TECH_INTERVIEW, text: 'Technical Interview' },
     { id: InterviewType.CODING_INTERVIEW, text: 'Coding Interview' },
@@ -83,15 +83,13 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
     { id: LangType.RUSSIAN, country: 'Russian (Русский)', deepgramCode: 'ru' },
   ];
 
-  const DifficultyTypeList: ({id: number, text: string})[] = [
+  const DifficultyTypeList: { id: number; text: string }[] = [
     { id: DifficultyType.Junior, text: 'Junior' },
     { id: DifficultyType.Mid, text: 'Mid-Level' },
     { id: DifficultyType.Senior, text: 'Senior' },
   ];
 
-  const handleMockInterviewStartClick = (): void => {
-
-  }
+  const handleMockInterviewStartClick = (): void => {};
 
   return (
     <section className="screen screen--light home-screen">
@@ -127,29 +125,35 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
             </p>
           </div>
 
-          <div className="form-grid">
+          <div className="form-grid u-mb-4">
             <label>
               Interview type
               <select defaultValue="technical">
-                {InterviewTypeList.map((v, index) => 
-                  <option key={index} value={v.id}>{v.text}</option>
-                )}
+                {InterviewTypeList.map((v, index) => (
+                  <option key={index} value={v.id}>
+                    {v.text}
+                  </option>
+                ))}
               </select>
             </label>
             <label>
               Language
               <select defaultValue="30">
-                {LangTypeList.map((v, index) => 
-                  <option key={index} value={v.id}>{v.country}</option>
-                )}
+                {LangTypeList.map((v, index) => (
+                  <option key={index} value={v.id}>
+                    {v.country}
+                  </option>
+                ))}
               </select>
             </label>
             <label>
               Difficulty
               <select defaultValue="senior">
-                {DifficultyTypeList.map((v, index) => 
-                  <option key={index} value={v.id}>{v.text}</option>
-                )}
+                {DifficultyTypeList.map((v, index) => (
+                  <option key={index} value={v.id}>
+                    {v.text}
+                  </option>
+                ))}
               </select>
             </label>
             {/* <label>
@@ -162,14 +166,14 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
             </label> */}
           </div>
 
-          <div className="checks">
+          {/* <div className="checks">
             <label>
               <input type="checkbox" defaultChecked /> Use my resume
             </label>
             <label>
               <input type="checkbox" defaultChecked /> Use job description
             </label>
-          </div>
+          </div> */}
 
           <button className="primary-button" onClick={handleMockInterviewStartClick}>
             &#9673; Start mock interview <span>&rarr;</span>
