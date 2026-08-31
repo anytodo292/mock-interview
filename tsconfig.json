@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react",
+    "noImplicitAny": true,
+    "baseUrl": "src",
+    "paths": {
+      "components/*": ["components/*"],
+      "images/*": ["images/*"],
+      "styles/*": ["styles/*"]
+    }
+  },
+  "include": ["src", "index.d.ts"],
+  "exclude": ["node_modules"]
+}
