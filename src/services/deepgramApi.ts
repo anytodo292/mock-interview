@@ -1,10 +1,17 @@
-import { AgentSettingsObject } from '@deepgram/agents';
+import { AgentSessionConfig, AgentSettingsObject } from '@deepgram/agents';
 import { MockInterviewParams } from '../components/Interview/types';
 
 const TOKEN_ENDPOINT = '/agent/get_dg_token';
 const AGENT_BUILD_ENDPOINT = '/agent/get_agent_build';
 
 type JsonObject = Record<string, unknown>;
+
+export interface AgentBuildConfig {
+  agent: AgentSettingsObject | string;
+  audio?: AgentSessionConfig['audio'];
+  tags?: string[];
+  experimental?: boolean;
+}
 
 async function postJson(endpoint: string, params?: object): Promise<unknown> {
   const backendUrl = __BACKEND_API_URL__.replace(/\/$/, '');
@@ -39,6 +46,30 @@ function unwrap(value: unknown, keys: string[]): unknown {
   return value;
 }
 
+function normalizeAgent(agent: unknown): AgentSettingsObject | string {
+  if (typeof agent === 'string' && agent.trim() !== '') return agent;
+  if (!isObject(agent)) {
+    throw new Error('The agent build does not contain a valid agent configuration.');
+  }
+
+  const normalizedAgent: JsonObject = { ...agent };
+  const think = normalizedAgent.think;
+
+  if (isObject(think) && isObject(think.provider)) {
+    const { model, temperature, ...thinkSettings } = think;
+    normalizedAgent.think = {
+      ...thinkSettings,
+      provider: {
+        ...think.provider,
+        ...(model !== undefined ? { model } : {}),
+        ...(temperature !== undefined ? { temperature } : {}),
+      },
+    };
+  }
+
+  return normalizedAgent as AgentSettingsObject;
+}
+
 export async function fetchDeepgramToken(): Promise<string> {
   const payload = await postJson(TOKEN_ENDPOINT);
   const token = unwrap(payload, ['data', 'msg', 'access_token']);
@@ -50,14 +81,22 @@ export async function fetchDeepgramToken(): Promise<string> {
   return token;
 }
 
-export async function fetchAgentBuild(
-  params: MockInterviewParams,
-): Promise<AgentSettingsObject | string> {
+export async function fetchAgentBuild(params: MockInterviewParams): Promise<AgentBuildConfig> {
   const payload = await postJson(AGENT_BUILD_ENDPOINT, params);
   const build = unwrap(payload, ['data', 'msg']);
 
-  if (typeof build === 'string' && build.trim() !== '') return build;
-  if (isObject(build)) return build as AgentSettingsObject;
+  if (typeof build === 'string') return { agent: normalizeAgent(build) };
+  if (isObject(build) && build.agent !== undefined) {
+    return {
+      agent: normalizeAgent(build.agent),
+      audio: build.audio as AgentSessionConfig['audio'],
+      tags: Array.isArray(build.tags)
+        ? build.tags.filter((tag): tag is string => typeof tag === 'string')
+        : undefined,
+      experimental: typeof build.experimental === 'boolean' ? build.experimental : undefined,
+    };
+  }
+  if (isObject(build)) return { agent: normalizeAgent(build) };
 
   throw new Error('The agent build endpoint did not return an agent ID or configuration.');
 }

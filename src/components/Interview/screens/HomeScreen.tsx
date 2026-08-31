@@ -74,18 +74,13 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
   ];
 
   const LangTypeList = [
-    { id: LangType.ARABIC, country: 'Arabic (العربية)', deepgramCode: 'ar' },
-    { id: LangType.CHINESE, country: 'Chinese (中文)', deepgramCode: 'zh' },
     { id: LangType.DUTCH, country: 'Dutch (Nederlands)', deepgramCode: 'nl' },
     { id: LangType.ENGLISH, country: 'English (US)', deepgramCode: 'en' },
     { id: LangType.FRENCH, country: 'French (Français)', deepgramCode: 'fr' },
     { id: LangType.GERMAN, country: 'German (Deutsch)', deepgramCode: 'de' },
     { id: LangType.ITALIAN, country: 'Italian (Italiano)', deepgramCode: 'it' },
     { id: LangType.JAPANESE, country: 'Japanese (日本語)', deepgramCode: 'ja' },
-    { id: LangType.KOREAN, country: 'Korean (한국어)', deepgramCode: 'ko' },
-    { id: LangType.PORTUGUESE, country: 'Portuguese (Português)', deepgramCode: 'pt' },
-    { id: LangType.SPANISH, country: 'Spanish (Español)', deepgramCode: 'es' },
-    { id: LangType.RUSSIAN, country: 'Russian (Русский)', deepgramCode: 'ru' },
+    { id: LangType.SPANISH, country: 'Spanish (Español)', deepgramCode: 'es' }
   ];
 
   const DifficultyTypeList: { id: number; text: string }[] = [

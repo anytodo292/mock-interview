@@ -110,18 +110,18 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
       try {
         const agentBuild = await fetchAgentBuild(params);
+        const inputSampleRate = agentBuild.audio?.input?.sampleRate ?? 16_000;
+        const outputSampleRate = agentBuild.audio?.output?.sampleRate ?? 24_000;
         const session = new AgentSession({
           auth: { tokenFactory: fetchDeepgramToken },
-          agent: agentBuild,
-          audio: {
-            input: { encoding: 'linear16', sampleRate: 16_000 },
-            output: { encoding: 'linear16', sampleRate: 24_000 },
-          },
-          tags: ['mock-interview'],
+          agent: agentBuild.agent,
+          audio: agentBuild.audio,
+          tags: agentBuild.tags ?? ['mock-interview'],
+          experimental: agentBuild.experimental,
         });
-        const player = new AgentPlayer({ sampleRate: 24_000 });
+        const player = new AgentPlayer({ sampleRate: outputSampleRate });
         const microphone = new AgentMicrophone((audio) => session.sendAudio(audio), {
-          sampleRate: 16_000,
+          sampleRate: inputSampleRate,
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
