@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
+import { MockInterviewParams } from '../types';
 
 interface HomeScreenProps {
-  onStart: () => void;
+  onStart: (params: MockInterviewParams) => void;
 }
 
 const InterviewType = {
@@ -50,6 +51,10 @@ const DifficultyType = {
 };
 
 export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
+  const [scenario, setScenario] = useState<number>(InterviewType.TECH_INTERVIEW);
+  const [language, setLanguage] = useState<number>(LangType.ENGLISH);
+  const [difficulty, setDifficulty] = useState<number>(DifficultyType.Senior);
+
   const InterviewTypeList: { id: number; text: string }[] = [
     { id: InterviewType.SCREENING_INTERVIEW, text: 'Screening Interview' },
     { id: InterviewType.TECH_INTERVIEW, text: 'Technical Interview' },
@@ -89,7 +94,9 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
     { id: DifficultyType.Senior, text: 'Senior' },
   ];
 
-  const handleMockInterviewStartClick = (): void => {};
+  const handleMockInterviewStartClick = (): void => {
+    onStart({ scenario, language, difficulty });
+  };
 
   return (
     <section className="screen screen--light home-screen">
@@ -128,7 +135,7 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
           <div className="form-grid u-mb-4">
             <label>
               Interview type
-              <select defaultValue="technical">
+              <select value={scenario} onChange={(e) => setScenario(parseInt(e.target.value, 10))}>
                 {InterviewTypeList.map((v, index) => (
                   <option key={index} value={v.id}>
                     {v.text}
@@ -138,7 +145,7 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
             </label>
             <label>
               Language
-              <select defaultValue="30">
+              <select value={language} onChange={(e) => setLanguage(parseInt(e.target.value, 10))}>
                 {LangTypeList.map((v, index) => (
                   <option key={index} value={v.id}>
                     {v.country}
@@ -148,7 +155,10 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
             </label>
             <label>
               Difficulty
-              <select defaultValue="senior">
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(parseInt(e.target.value, 10))}
+              >
                 {DifficultyTypeList.map((v, index) => (
                   <option key={index} value={v.id}>
                     {v.text}

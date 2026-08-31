@@ -1,8 +1,8 @@
 {
-  "name": "webpack-5-react-typescript-boilerplate",
+  "name": "mock-interview",
   "version": "2.0.0",
-  "description": "A webpack 5 boilerplate with React TypeScript",
-  "author": "Per Olsen",
+  "description": "mock-interview",
+  "author": "Anytodo",
   "license": "MIT",
   "scripts": {
     "start": "webpack serve --config config/webpack.dev.js --progress",

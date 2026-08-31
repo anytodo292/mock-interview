@@ -1,18 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { CallControls } from '../shared/CallControls';
 import { interviewer, InterviewerIdentity, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
 
 interface LiveScreenProps {
-  onThinking?: () => void;
   onEnd: () => void;
+  muted: boolean;
+  paused: boolean;
+  agentSpeaking: boolean;
+  agentMessage?: string;
+  onMute: () => void;
+  onPause: () => void;
 }
 
-export function LiveScreen({ onThinking, onEnd }: LiveScreenProps): JSX.Element {
-  const [muted, setMuted] = useState(false);
-  const [paused, setPaused] = useState(false);
-
+export function LiveScreen({
+  onEnd,
+  muted,
+  paused,
+  agentSpeaking,
+  agentMessage,
+  onMute,
+  onPause,
+}: LiveScreenProps): JSX.Element {
   return (
     <section
       className={`screen screen--dark interview-screen ${paused ? 'interview-screen--paused' : ''}`}
@@ -24,7 +34,7 @@ export function LiveScreen({ onThinking, onEnd }: LiveScreenProps): JSX.Element 
           <div className="video-frame">
             <img src={interviewer} alt="Emma speaking" />
             <div className="speaking">
-              <Waveform green /> Speaking
+              <Waveform green /> {agentSpeaking ? 'Speaking' : 'Ready'}
             </div>
           </div>
         </div>
@@ -36,7 +46,7 @@ export function LiveScreen({ onThinking, onEnd }: LiveScreenProps): JSX.Element 
             </span>
             <h1>Let&apos;s talk about your experience.</h1>
             <p className="question">
-              Tell me about yourself and your experience in backend development.
+              {agentMessage ?? 'Emma is ready. Say hello to begin your mock interview.'}
             </p>
           </div>
 
@@ -49,15 +59,12 @@ export function LiveScreen({ onThinking, onEnd }: LiveScreenProps): JSX.Element 
           </div>
 
           <p className="hint">Take your time. Emma will listen until you finish your answer.</p>
-          <button className="answer-button" onClick={onThinking} disabled={paused}>
-            I&apos;ve finished my answer <span>&rarr;</span>
-          </button>
           <CallControls
             onEnd={onEnd}
             muted={muted}
             paused={paused}
-            onMute={() => setMuted((value) => !value)}
-            onPause={() => setPaused((value) => !value)}
+            onMute={onMute}
+            onPause={onPause}
           />
         </div>
       </div>

@@ -1,6 +1,12 @@
-export type Screen = 'home' | 'connecting' | 'live' | 'finished'; //| 'thinking'  | 'report'
+export type Screen = 'home' | 'connecting' | 'live' | 'thinking' | 'finished' | 'report';
 
 export type Theme = 'light' | 'dark';
+
+export interface MockInterviewParams {
+  scenario: number;
+  language: number;
+  difficulty: number;
+}
 
 export interface ScreenDefinition {
   id: Screen;

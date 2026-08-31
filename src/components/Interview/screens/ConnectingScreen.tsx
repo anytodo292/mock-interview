@@ -1,18 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
 
-interface ConnectingScreenProps {
-  onConnected: () => void;
-}
-
-export function ConnectingScreen({ onConnected }: ConnectingScreenProps): JSX.Element {
-  useEffect(() => {
-    const timer = window.setTimeout(onConnected, 2600);
-    return () => window.clearTimeout(timer);
-  }, [onConnected]);
-
+export function ConnectingScreen(): JSX.Element {
   return (
     <section className="screen screen--dark connecting-screen">
       <TopBar dark />

@@ -1,5 +1,12 @@
 const pathtoresolve = require('path');
+const webpack = require('webpack')
 const paths = require('./paths')
+
+try {
+  process.loadEnvFile(pathtoresolve.resolve(__dirname, '../.env'))
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error
+}
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -41,6 +48,11 @@ module.exports = {
 
     // Removes/cleans build folders and unused assets when rebuilding
     new CleanWebpackPlugin(),
+
+    // Expose only the public backend URL, not the rest of the server environment.
+    new webpack.DefinePlugin({
+      __BACKEND_API_URL__: JSON.stringify(process.env.BACKEND_API_URL || ''),
+    }),
 
     new ForkTsCheckerWebpackPlugin({
       async: false,

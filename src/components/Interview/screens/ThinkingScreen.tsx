@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { CallControls } from '../shared/CallControls';
 import { interviewer, InterviewerIdentity } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
 
 interface ThinkingScreenProps {
-  onContinue: () => void;
   onEnd: () => void;
+  muted: boolean;
+  paused: boolean;
+  onMute: () => void;
+  onPause: () => void;
 }
 
-export function ThinkingScreen({ onContinue, onEnd }: ThinkingScreenProps): JSX.Element {
-  const [muted, setMuted] = useState(false);
-  const [paused, setPaused] = useState(false);
-
+export function ThinkingScreen({
+  onEnd,
+  muted,
+  paused,
+  onMute,
+  onPause,
+}: ThinkingScreenProps): JSX.Element {
   return (
     <section
       className={`screen screen--dark interview-screen ${paused ? 'interview-screen--paused' : ''}`}
@@ -47,15 +53,12 @@ export function ThinkingScreen({ onContinue, onEnd }: ThinkingScreenProps): JSX.
             <i />
             <i />
           </div>
-          <button className="answer-button" onClick={onContinue} disabled={paused}>
-            Continue interview <span>&rarr;</span>
-          </button>
           <CallControls
             onEnd={onEnd}
             muted={muted}
             paused={paused}
-            onMute={() => setMuted((value) => !value)}
-            onPause={() => setPaused((value) => !value)}
+            onMute={onMute}
+            onPause={onPause}
           />
         </div>
       </div>
