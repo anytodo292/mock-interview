@@ -555,6 +555,15 @@ button {
   position: absolute;
   inset: 0;
 }
+
+.video-frame > .portrait-frame {
+  opacity: 0;
+  transition: opacity 55ms ease-out;
+}
+
+.video-frame > .portrait-frame--visible {
+  opacity: 1;
+}
 .video-frame--thinking > img {
   filter: saturate(0.76) brightness(0.88);
 }

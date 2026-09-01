@@ -32,6 +32,7 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
     alias: {
+      '@': pathtoresolve.resolve(__dirname, '../src'),
       'components': pathtoresolve.resolve(__dirname, '../src/components/'),
       'images': pathtoresolve.resolve(__dirname, '../src/images/'),
       'styles': pathtoresolve.resolve(__dirname, '../src/styles/'),

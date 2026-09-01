@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
+import { InterviewerInfo } from '@/constants';
 
 export function ConnectingScreen(): JSX.Element {
   return (
@@ -18,7 +19,7 @@ export function ConnectingScreen(): JSX.Element {
           <Avatar />
         </div>
         <h2>
-          Emma is joining<span className="animated-dots">...</span>
+          {InterviewerInfo[0].name} is joining<span className="animated-dots">...</span>
         </h2>
         <div className="loading-dots">
           <i />

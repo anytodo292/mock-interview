@@ -3,57 +3,18 @@ import React, { useState } from 'react';
 import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
 import { MockInterviewParams } from '../types';
+import { InterviewerInfo, InterviewType, LangType, DifficultyType } from '@/constants';
 
 interface HomeScreenProps {
   onStart: (params: MockInterviewParams) => void;
 }
 
-const InterviewType = {
-  // QUICK_CALL: -1,
-  TECH_INTERVIEW: 0,
-  // HR_INTERVIEW: 1,
-  TEAM_MEETING: 2,
-  CLIENT_MEETING: 3,
-  CONSULTING: 4,
-  CASUAL_CONVERSATION: 5,
-  // ONLINE_ASSESSMENT: 6,
-
-  SCREENING_INTERVIEW: 7,
-  CODING_INTERVIEW: 8,
-  SYS_DESGIN_INTERVIEW: 9,
-  BEHAV_INTERVIEW: 10,
-  CASE_INTERVIEW: 11,
-  SITUATION_INTERVIEW: 12,
-  CULTURE_INTERVIEW: 13,
-  FINAL_INTERVIEW: 14,
-  AI_INTERVIEW: 15,
-};
-
-const LangType = {
-  CHINESE: 0,
-  DUTCH: 1,
-  ENGLISH: 2,
-  FRENCH: 3,
-  GERMAN: 4,
-  ITALIAN: 5,
-  JAPANESE: 6,
-  SPANISH: 7,
-  RUSSIAN: 8,
-  ARABIC: 9,
-  PORTUGUESE: 10,
-  KOREAN: 11,
-};
-
-const DifficultyType = {
-  Junior: 0,
-  Mid: 1,
-  Senior: 2,
-};
-
 export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
   const [scenario, setScenario] = useState<number>(InterviewType.TECH_INTERVIEW);
   const [language, setLanguage] = useState<number>(LangType.ENGLISH);
   const [difficulty, setDifficulty] = useState<number>(DifficultyType.Senior);
+  
+  const [selectedInterviewInfo, setSelectedInterviewerInfo] = useState();
 
   const InterviewTypeList: { id: number; text: string }[] = [
     { id: InterviewType.SCREENING_INTERVIEW, text: 'Screening Interview' },
@@ -93,6 +54,13 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
     onStart({ scenario, language, difficulty });
   };
 
+  const handleLanguageChange = (lang: number): void => {
+    setLanguage(lang);
+    
+    const selected = InterviewerInfo.find(v => v.language === lang)
+    setSelectedInterviewerInfo(selected);  
+  }
+
   return (
     <section className="screen screen--light home-screen">
       <TopBar />
@@ -101,7 +69,7 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
           <span className="eyebrow">AI-powered practice</span>
           <h1>Walk into your next interview with confidence.</h1>
           <p>
-            Practice with Emma, your realistic AI interviewer, and get focused feedback after every
+            Practice with {InterviewerInfo[0].name}, your realistic AI interviewer, and get focused feedback after every
             session.
           </p>
           <div className="benefit-row">
@@ -118,7 +86,7 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
               <span className="online">Online</span>
             </div>
             <h2>
-              Emma <span className="verified">&#10003;</span>
+              {InterviewerInfo[0].name} <span className="verified">&#10003;</span>
             </h2>
             <p>
               Senior Engineering Manager
@@ -140,7 +108,7 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
             </label>
             <label>
               Language
-              <select value={language} onChange={(e) => setLanguage(parseInt(e.target.value, 10))}>
+              <select value={language} onChange={(e) => handleLanguageChange(parseInt(e.target.value, 10))}>
                 {LangTypeList.map((v, index) => (
                   <option key={index} value={v.id}>
                     {v.country}

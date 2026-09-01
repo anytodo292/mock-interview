@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { CallControls } from '../shared/CallControls';
-import { interviewer, InterviewerIdentity } from '../shared/InterviewVisuals';
+import { InterviewerIdentity } from '../shared/InterviewVisuals';
+import { InterviewerInfo } from '@/constants';
 import { TopBar } from '../shared/TopBar';
 
 interface ThinkingScreenProps {
@@ -28,7 +29,7 @@ export function ThinkingScreen({
         <div className="video-column">
           <InterviewerIdentity time="12:15" />
           <div className="video-frame video-frame--thinking">
-            <img src={interviewer} alt="Emma considering the answer" />
+            <img src={InterviewerInfo[0].image} alt={`${InterviewerInfo[0].name} considering the answer`} />
             <div className="speaking">
               <span className="thinking-dot" /> AI thinking
             </div>
@@ -43,7 +44,7 @@ export function ThinkingScreen({
           <p>
             {paused
               ? 'Your interview is paused. Resume whenever you are ready.'
-              : 'Emma is reviewing the clarity, structure and technical depth of your response.'}
+              : `${InterviewerInfo[0].name} is reviewing the clarity, structure and technical depth of your response.`}
           </p>
           <div className="brain">
             <span>{paused ? 'Ⅱ' : '⌘'}</span>

@@ -61,7 +61,7 @@ export default function App(): JSX.Element {
         onEnd={endInterview}
         muted={interview.muted}
         paused={interview.paused}
-        agentSpeaking={interview.status === 'speaking'}
+        agentSpeaking={interview.agentSpeaking}
         agentMessage={latestAgentMessage}
         onMute={interview.toggleMute}
         onPause={interview.togglePause}

@@ -1,8 +1,9 @@
 import React from 'react';
 
 import { CallControls } from '../shared/CallControls';
-import { interviewer, InterviewerIdentity, Waveform } from '../shared/InterviewVisuals';
+import { InterviewerIdentity, SpeakingPortrait, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
+import { InterviewerInfo } from '@/constants';
 
 interface LiveScreenProps {
   onEnd: () => void;
@@ -32,7 +33,7 @@ export function LiveScreen({
         <div className="video-column">
           <InterviewerIdentity />
           <div className="video-frame">
-            <img src={interviewer} alt="Emma speaking" />
+            <SpeakingPortrait isSpeaking={agentSpeaking && !paused} />
             <div className="speaking">
               <Waveform green /> {agentSpeaking ? 'Speaking' : 'Ready'}
             </div>
@@ -46,7 +47,7 @@ export function LiveScreen({
             </span>
             <h1>Let&apos;s talk about your experience.</h1>
             <p className="question">
-              {agentMessage ?? 'Emma is ready. Say hello to begin your mock interview.'}
+              {agentMessage ?? `${InterviewerInfo[0].name} is ready. Say hello to begin your mock interview.`}
             </p>
           </div>
 
@@ -58,7 +59,7 @@ export function LiveScreen({
             <Waveform />
           </div>
 
-          <p className="hint">Take your time. Emma will listen until you finish your answer.</p>
+          <p className="hint">Take your time. {InterviewerInfo[0].name} will listen until you finish your answer.</p>
           <CallControls
             onEnd={onEnd}
             muted={muted}
