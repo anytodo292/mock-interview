@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTheme } from './ThemeContext';
 
 function Logo(): JSX.Element {
   return (
@@ -10,13 +11,21 @@ function Logo(): JSX.Element {
 }
 
 export function TopBar({ dark = false }: { dark?: boolean }): JSX.Element {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <header className={`topbar ${dark ? 'topbar--dark' : ''}`}>
       <Logo />
-      <div className="topbar__actions" aria-hidden="true">
-        <span>&#10019;</span>
-        <span>&times;</span>
-      </div>
+      <button
+        type="button"
+        className="theme-toggle"
+        onClick={toggleTheme}
+        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+        title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+      >
+        <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
+        <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+      </button>
     </header>
   );
 }

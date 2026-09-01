@@ -6,6 +6,7 @@ import { HomeScreen } from 'components/Interview/screens/HomeScreen';
 import { LiveScreen } from 'components/Interview/screens/LiveScreen';
 import { ReportScreen } from 'components/Interview/screens/ReportScreen';
 import { ThinkingScreen } from 'components/Interview/screens/ThinkingScreen';
+import { ThemeProvider } from 'components/Interview/shared/ThemeContext';
 import { MockInterviewParams, Screen, Theme } from 'components/Interview/types';
 import { useDeepgramInterview } from '../../hooks/useDeepgramInterview';
 
@@ -75,34 +76,25 @@ export default function App(): JSX.Element {
         onPause={interview.togglePause}
       />
     ),
-    finished: <FinishedScreen onReport={() => setScreen('report')} onAgain={restartInterview} />,
+    finished: <FinishedScreen onAgain={restartInterview} />,
     report: <ReportScreen onAgain={restartInterview} />,
   };
 
   return (
     <main className={`app-shell theme--${theme}`}>
-      <button
-        type="button"
-        className="theme-toggle"
-        onClick={toggleTheme}
-        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-        title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-      >
-        <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
-        <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
-      </button>
+      <ThemeProvider theme={theme} toggleTheme={toggleTheme}>
+        {interview.error && (
+          <div className="session-error" role="alert">
+            <strong>Interview connection failed</strong>
+            <span>{interview.error}</span>
+            <button type="button" onClick={restartInterview}>
+              Return home
+            </button>
+          </div>
+        )}
 
-      {interview.error && (
-        <div className="session-error" role="alert">
-          <strong>Interview connection failed</strong>
-          <span>{interview.error}</span>
-          <button type="button" onClick={restartInterview}>
-            Return home
-          </button>
-        </div>
-      )}
-
-      {screenViews[screen]}
+        {screenViews[screen]}
+      </ThemeProvider>
     </main>
   );
 }

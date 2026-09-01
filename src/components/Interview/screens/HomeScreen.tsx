@@ -16,7 +16,7 @@ const InterviewType = {
   CLIENT_MEETING: 3,
   CONSULTING: 4,
   CASUAL_CONVERSATION: 5,
-  ONLINE_ASSESSMENT: 6,
+  // ONLINE_ASSESSMENT: 6,
 
   SCREENING_INTERVIEW: 7,
   CODING_INTERVIEW: 8,
@@ -70,7 +70,7 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
     { id: InterviewType.CLIENT_MEETING, text: 'Client Meeting' },
     { id: InterviewType.CONSULTING, text: 'Consultation Meeting' },
     { id: InterviewType.CASUAL_CONVERSATION, text: 'Casual Conversation' },
-    { id: InterviewType.ONLINE_ASSESSMENT, text: 'Online Assessment' },
+    // { id: InterviewType.ONLINE_ASSESSMENT, text: 'Online Assessment' },
   ];
 
   const LangTypeList = [
@@ -80,7 +80,7 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
     { id: LangType.GERMAN, country: 'German (Deutsch)', deepgramCode: 'de' },
     { id: LangType.ITALIAN, country: 'Italian (Italiano)', deepgramCode: 'it' },
     { id: LangType.JAPANESE, country: 'Japanese (日本語)', deepgramCode: 'ja' },
-    { id: LangType.SPANISH, country: 'Spanish (Español)', deepgramCode: 'es' }
+    { id: LangType.SPANISH, country: 'Spanish (Español)', deepgramCode: 'es' },
   ];
 
   const DifficultyTypeList: { id: number; text: string }[] = [

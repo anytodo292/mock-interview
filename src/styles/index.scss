@@ -26,10 +26,6 @@ body {
 }
 
 .theme-toggle {
-  position: fixed;
-  z-index: 30;
-  top: 34px;
-  right: 125px;
   min-width: 86px;
   height: 38px;
   padding: 0 13px;
@@ -816,6 +812,103 @@ button {
 }
 
 /* Results */
+.completion-layout {
+  min-height: calc(100vh - 126px);
+  padding: 55px clamp(40px, 7vw, 110px);
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  align-items: center;
+  gap: clamp(48px, 9vw, 130px);
+}
+
+.completion-hero {
+  max-width: 540px;
+}
+
+.completion-check {
+  width: 86px;
+  height: 86px;
+  margin-bottom: 28px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(145deg, #27c985, #4cdbb1);
+  border-radius: 50%;
+  box-shadow: 0 18px 45px #25ba7b38;
+  font-size: 40px;
+  font-weight: 800;
+}
+
+.completion-hero h1 {
+  margin: 14px 0 18px;
+  font-size: clamp(38px, 4.2vw, 60px);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.completion-hero p {
+  max-width: 520px;
+  color: #717991;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.completion-card {
+  padding: 30px;
+  color: #141a33;
+  background: #fff;
+  border: 1px solid #e4e6ef;
+  border-radius: 18px;
+  box-shadow: 0 25px 70px #242c5710;
+}
+
+.completion-card h2 {
+  margin: 0 0 18px;
+  font-size: 20px;
+}
+
+.session-summary {
+  margin: 0;
+}
+
+.session-summary > div {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #eceef4;
+}
+
+.session-summary dt {
+  color: #777f95;
+  font-size: 13px;
+}
+
+.session-summary dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 750;
+  text-align: right;
+}
+
+.session-summary__complete {
+  color: #16ad68;
+}
+
+.completion-card .primary-button,
+.completion-card .secondary-button {
+  width: 100%;
+}
+
+.completion-card .secondary-button {
+  margin-top: 10px;
+}
+
+.completion-card__restart {
+  margin-top: 24px;
+}
+
 .results-layout {
   min-height: calc(100vh - 126px);
   padding: 55px clamp(40px, 6vw, 90px);
@@ -1124,6 +1217,7 @@ button {
   }
 
   .setup-card,
+  .completion-card,
   .score-card,
   .report-item {
     color: #eaf7f6;
@@ -1167,6 +1261,15 @@ button {
   .great-job {
     color: #62e0bd;
     background: #12352e;
+  }
+
+  .completion-hero p,
+  .session-summary dt {
+    color: #92a9ae;
+  }
+
+  .session-summary > div {
+    border-color: #23353d;
   }
 
   .score-row {
@@ -1286,8 +1389,6 @@ button {
   }
 
   .theme-toggle {
-    top: 14px;
-    right: 74px;
     min-width: 38px;
     width: 38px;
     padding: 0;
@@ -1313,6 +1414,7 @@ button {
     border-radius: 0;
   }
   .home-grid,
+  .completion-layout,
   .results-layout {
     grid-template-columns: 1fr;
   }
@@ -1406,6 +1508,10 @@ button {
   .results-layout {
     padding: 35px 18px 90px;
     gap: 32px;
+  }
+  .completion-layout {
+    padding: 45px 28px 90px;
+    gap: 38px;
   }
   .score-ring {
     width: 190px;
