@@ -5,8 +5,8 @@
   "author": "Anytodo",
   "license": "MIT",
   "scripts": {
-    "start": "webpack serve --config config/webpack.dev.js --progress",
-    "build": "webpack --config config/webpack.prod.js",
+    "start": "cross-env NODE_ENV=development webpack serve --config config/webpack.dev.js --progress",
+    "build": "cross-env NODE_ENV=production webpack --config config/webpack.prod.js",
     "format": "prettier --write \"src/**/*.{ts,tsx,scss,html}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,scss,html}\"",
     "typecheck": "tsc --noEmit",

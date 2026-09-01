@@ -3,7 +3,7 @@ const webpack = require('webpack')
 const paths = require('./paths')
 
 try {
-  process.loadEnvFile(pathtoresolve.resolve(__dirname, '../.env'))
+  process.loadEnvFile(pathtoresolve.resolve(__dirname, process.env.NODE_ENV === 'production' ? '../.env.production' : '../.env.development'))
 } catch (error) {
   if (error.code !== 'ENOENT') throw error
 }
@@ -29,7 +29,6 @@ module.exports = {
     publicPath: '/',
   },
 
-
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
     alias: {
@@ -39,19 +38,16 @@ module.exports = {
     }
   },
 
-
   // Customize the webpack build process
   plugins: [
-
-
     //new FriendlyErrorsPlugin(),
-
     // Removes/cleans build folders and unused assets when rebuilding
     new CleanWebpackPlugin(),
 
     // Expose only the public backend URL, not the rest of the server environment.
     new webpack.DefinePlugin({
       __BACKEND_API_URL__: JSON.stringify(process.env.BACKEND_API_URL || ''),
+      __PUBLIC_URL__: JSON.stringify(process.env.PUBLIC_URL || ''),
     }),
 
     new ForkTsCheckerWebpackPlugin({
@@ -83,10 +79,8 @@ module.exports = {
   // Determine how modules within the project are treated
   module: {
     rules: [
-
       // Note: These 2 rules could likely be handled in one test: statement.
       // However, using 2 seperate statements each sttament could have different options if needed
-
       // Use Babel to transpile JavaScript ES6+ / React files to ES5
       {
         test: /\.(jsx|js)$/,

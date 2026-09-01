@@ -1,6 +1,6 @@
 import React from 'react';
 
-import interviewer from 'images/interviewer.png';
+export const interviewer = `${__PUBLIC_URL__}/assets/images/interviewer.png`;
 
 const waveHeights = [
   10, 18, 30, 16, 38, 24, 44, 20, 34, 14, 27, 42, 18, 31, 12, 22, 36, 17, 26, 10,
@@ -43,5 +43,3 @@ export function InterviewerIdentity({ time = '08:42' }: { time?: string }): JSX.
     </div>
   );
 }
-
-export { interviewer };
