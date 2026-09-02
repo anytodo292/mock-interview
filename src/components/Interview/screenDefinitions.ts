@@ -7,4 +7,5 @@ export const screenDefinitions: ScreenDefinition[] = [
   { id: 'thinking', label: 'AI thinking' },
   { id: 'finished', label: 'Finished' },
   { id: 'report', label: 'Detailed report' },
+  { id: 'invalid', label: 'Invalid interview' },
 ];

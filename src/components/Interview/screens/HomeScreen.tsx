@@ -7,12 +7,22 @@ import { getInterviewerInfo, InterviewType, LangType, DifficultyType } from '@/c
 
 interface HomeScreenProps {
   onStart: (params: MockInterviewParams) => void;
+  initialParams?: MockInterviewParams;
+  lockInterview?: boolean;
 }
 
-export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
-  const [scenario, setScenario] = useState<number>(InterviewType.TECH_INTERVIEW);
-  const [language, setLanguage] = useState<number>(LangType.ENGLISH);
-  const [difficulty, setDifficulty] = useState<number>(DifficultyType.Senior);
+export function HomeScreen({
+  onStart,
+  initialParams,
+  lockInterview = false,
+}: HomeScreenProps): JSX.Element {
+  const [scenario, setScenario] = useState<number>(
+    initialParams?.scenario ?? InterviewType.TECH_INTERVIEW,
+  );
+  const [language, setLanguage] = useState<number>(initialParams?.language ?? LangType.ENGLISH);
+  const [difficulty, setDifficulty] = useState<number>(
+    initialParams?.difficulty ?? DifficultyType.Senior,
+  );
 
   const selectedInterviewer = getInterviewerInfo(language);
 
@@ -95,7 +105,11 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
           <div className="form-grid u-mb-4">
             <label>
               Interview type
-              <select value={scenario} onChange={(e) => setScenario(parseInt(e.target.value, 10))}>
+              <select
+                value={scenario}
+                disabled={lockInterview}
+                onChange={(e) => setScenario(parseInt(e.target.value, 10))}
+              >
                 {InterviewTypeList.map((v, index) => (
                   <option key={index} value={v.id}>
                     {v.text}
@@ -107,6 +121,7 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
               Language
               <select
                 value={language}
+                disabled={lockInterview}
                 onChange={(e) => handleLanguageChange(parseInt(e.target.value, 10))}
               >
                 {LangTypeList.map((v, index) => (

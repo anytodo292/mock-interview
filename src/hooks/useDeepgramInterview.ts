@@ -8,7 +8,7 @@ import {
 } from '@deepgram/agents';
 
 import { fetchAgentBuild, fetchDeepgramToken } from '../services/deepgramApi';
-import { MockInterviewParams } from '../components/Interview/types';
+import { InterviewStartParams } from '../components/Interview/types';
 
 export type InterviewStatus =
   'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'ended' | 'error';
@@ -32,7 +32,7 @@ interface DeepgramInterview {
   agentSpeaking: boolean;
   error: string | null;
   transcript: TranscriptEntry[];
-  start: (params: MockInterviewParams) => Promise<void>;
+  start: (params: InterviewStartParams) => Promise<void>;
   end: () => void;
   reset: () => void;
   toggleMute: () => void;
@@ -105,7 +105,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   }, [releaseResources]);
 
   const start = useCallback(
-    async (params: MockInterviewParams): Promise<void> => {
+    async ({ interviewId, ...params }: InterviewStartParams): Promise<void> => {
       intentionalEndRef.current = false;
       releaseResources();
       setError(null);
@@ -119,11 +119,14 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       setStatus('connecting');
 
       try {
-        const agentBuild = await fetchAgentBuild(params);
+        const extensionToken = interviewId ? await fetchDeepgramToken(interviewId) : null;
+        const agentBuild = await fetchAgentBuild(params, interviewId);
         const inputSampleRate = agentBuild.audio?.input?.sampleRate ?? 16_000;
         const outputSampleRate = agentBuild.audio?.output?.sampleRate ?? 24_000;
         const session = new AgentSession({
-          auth: { tokenFactory: fetchDeepgramToken },
+          auth: {
+            tokenFactory: extensionToken ? async () => extensionToken : fetchDeepgramToken,
+          },
           agent: agentBuild.agent,
           audio: agentBuild.audio,
           tags: agentBuild.tags ?? ['mock-interview'],

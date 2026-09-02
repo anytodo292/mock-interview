@@ -1,19 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { ConnectingScreen } from 'components/Interview/screens/ConnectingScreen';
 import { FinishedScreen } from 'components/Interview/screens/FinishedScreen';
 import { HomeScreen } from 'components/Interview/screens/HomeScreen';
+import { InvalidInterviewScreen } from 'components/Interview/screens/InvalidInterviewScreen';
 import { LiveScreen } from 'components/Interview/screens/LiveScreen';
 import { ReportScreen } from 'components/Interview/screens/ReportScreen';
 import { ThinkingScreen } from 'components/Interview/screens/ThinkingScreen';
 import { ThemeProvider } from 'components/Interview/shared/ThemeContext';
 import { MockInterviewParams, Screen, Theme } from 'components/Interview/types';
 import { useDeepgramInterview } from '../../hooks/useDeepgramInterview';
-import { getInterviewerInfo, LangType } from '@/constants';
+import { DifficultyType, getInterviewerInfo, LangType } from '@/constants';
+import { fetchInterview } from '../../services/deepgramApi';
+import { IInterview } from '@/types';
 
 export default function App(): JSX.Element {
-  const [screen, setScreen] = useState<Screen>('home');
+  const search = useMemo(() => new URLSearchParams(window.location.search), []);
+  const fromExtension = search.get('from') === 'extension';
+  const interviewId = search.get('li_id');
+  const msId = search.get('ms_id');
+
+  const extensionStartedRef = useRef(false);
+
+  const [screen, setScreen] = useState<Screen>(fromExtension ? 'connecting' : 'home');
   const [selectedLanguage, setSelectedLanguage] = useState<number>(LangType.ENGLISH);
+  const [extensionParams, setExtensionParams] = useState<MockInterviewParams | null>(null);
+  
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = window.localStorage.getItem('ntro-theme');
     return savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
@@ -30,6 +42,36 @@ export default function App(): JSX.Element {
     document.documentElement.style.colorScheme = theme;
   }, [theme]);
 
+  useEffect(() => {
+    if (!fromExtension || extensionStartedRef.current) return;
+    extensionStartedRef.current = true;
+
+    if (!msId || !interviewId) {
+      setScreen('invalid');
+      return;
+    }
+
+    void fetchInterview(msId, interviewId).then(
+      (record: IInterview|null) => {
+        if (!record) {
+          setScreen('invalid');
+          return;
+        }
+
+        setExtensionParams({
+          language: record.lang,
+          scenario: record.scenario,
+          difficulty: DifficultyType.Mid
+        });
+        setSelectedLanguage(record.lang);
+        setScreen('home');
+      },
+      () => {
+        setScreen('invalid');
+      },
+    );
+  }, [fromExtension, interview, interviewId]);
+
   const toggleTheme = (): void => {
     setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
   };
@@ -37,9 +79,14 @@ export default function App(): JSX.Element {
   const startInterview = (params: MockInterviewParams): void => {
     setSelectedLanguage(params.language);
     setScreen('connecting');
-    void interview.start(params).catch(() => {
-      // The hook exposes a user-facing error and owns resource cleanup.
-    });
+    void interview
+      .start({
+        ...params,
+        ...(fromExtension && interviewId ? { interviewId } : {}),
+      })
+      .catch(() => {
+        // The hook exposes a user-facing error and owns resource cleanup.
+      });
   };
 
   const endInterview = (): void => {
@@ -58,7 +105,13 @@ export default function App(): JSX.Element {
   const interviewer = getInterviewerInfo(selectedLanguage);
 
   const screenViews: Record<Screen, JSX.Element> = {
-    home: <HomeScreen onStart={startInterview} />,
+    home: (
+      <HomeScreen
+        onStart={startInterview}
+        initialParams={extensionParams ?? undefined}
+        lockInterview={fromExtension}
+      />
+    ),
     connecting: <ConnectingScreen interviewer={interviewer} />,
     live: (
       <LiveScreen
@@ -84,6 +137,7 @@ export default function App(): JSX.Element {
     ),
     finished: <FinishedScreen onAgain={restartInterview} />,
     report: <ReportScreen onAgain={restartInterview} />,
+    invalid: <InvalidInterviewScreen />,
   };
 
   return (

@@ -1,10 +1,10 @@
 import { AgentSessionConfig, AgentSettingsObject } from '@deepgram/agents';
 import { MockInterviewParams } from '../components/Interview/types';
+import { IInterview, JsonObject } from '@/types';
 
 const TOKEN_ENDPOINT = '/agent/get_dg_token';
 const AGENT_BUILD_ENDPOINT = '/agent/get_agent_build';
-
-type JsonObject = Record<string, unknown>;
+const INTERVIEW_ENDPOINT = '/agent/get_interview';
 
 export interface AgentBuildConfig {
   agent: AgentSettingsObject | string;
@@ -46,6 +46,15 @@ function unwrap(value: unknown, keys: string[]): unknown {
   return value;
 }
 
+function toNumber(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
 function normalizeAgent(agent: unknown): AgentSettingsObject | string {
   if (typeof agent === 'string' && agent.trim() !== '') return agent;
   if (!isObject(agent)) {
@@ -70,9 +79,12 @@ function normalizeAgent(agent: unknown): AgentSettingsObject | string {
   return normalizedAgent as AgentSettingsObject;
 }
 
-export async function fetchDeepgramToken(): Promise<string> {
-  const payload = await postJson(TOKEN_ENDPOINT);
-  const token = unwrap(payload, ['data', 'msg', 'access_token']);
+export async function fetchDeepgramToken(interviewId?: string): Promise<string> {
+  const res = await postJson(
+    TOKEN_ENDPOINT,
+    interviewId ? { interview_id: interviewId } : undefined,
+  );
+  const token = unwrap(res, ['data', 'msg', 'access_token']);
 
   if (typeof token !== 'string' || token.trim() === '') {
     throw new Error('The token endpoint did not return a valid temporary access token.');
@@ -81,9 +93,15 @@ export async function fetchDeepgramToken(): Promise<string> {
   return token;
 }
 
-export async function fetchAgentBuild(params: MockInterviewParams): Promise<AgentBuildConfig> {
-  const payload = await postJson(AGENT_BUILD_ENDPOINT, params);
-  const build = unwrap(payload, ['data', 'msg']);
+export async function fetchAgentBuild(
+  params: MockInterviewParams,
+  interviewId?: string,
+): Promise<AgentBuildConfig> {
+  const res = await postJson(AGENT_BUILD_ENDPOINT, {
+    ...params,
+    ...(interviewId ? { interview_id: interviewId } : {}),
+  });
+  const build = unwrap(res, ['data', 'msg']);
 
   if (typeof build === 'string') return { agent: normalizeAgent(build) };
   if (isObject(build) && build.agent !== undefined) {
@@ -99,4 +117,14 @@ export async function fetchAgentBuild(params: MockInterviewParams): Promise<Agen
   if (isObject(build)) return { agent: normalizeAgent(build) };
 
   throw new Error('The agent build endpoint did not return an agent ID or configuration.');
+}
+
+export async function fetchInterview(msId: string, interviewId: string): Promise<IInterview | null> {
+  if (interviewId.trim() === '') return null;
+
+  const res = await postJson(INTERVIEW_ENDPOINT, { ms_id: msId, li_id: interviewId });
+  const interview = unwrap(res, ['data', 'msg']);
+  if (!interview) return null;
+
+  return interview as IInterview;
 }
