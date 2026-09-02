@@ -3,10 +3,13 @@ import { useTheme } from './ThemeContext';
 
 function Logo(): JSX.Element {
   return (
-    <div className="brand">
-      <span className="brand__mark">N</span>
-      <span>NTRO Copilot</span>
-    </div>
+    <a className="brand" href="https://www.ntro.io" aria-label="Visit NTRO">
+      <img
+        className="brand__logo"
+        src={`${__PUBLIC_URL__}/assets/images/logo.png`}
+        alt="NTRO Copilot"
+      />
+    </a>
   );
 }
 

@@ -183,20 +183,27 @@ button {
   border-color: #ffffff0a;
 }
 .brand {
-  font-weight: 750;
   display: flex;
   align-items: center;
-  gap: 10px;
+  border-radius: 6px;
+  text-decoration: none;
 }
-.brand__mark {
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  color: white;
-  background: linear-gradient(140deg, #8157ff, #4458f7);
-  border-radius: 8px;
-  box-shadow: 0 5px 16px #6d4eff55;
+
+.brand:focus-visible {
+  outline: 2px solid #62dcc8;
+  outline-offset: 5px;
+}
+
+.brand__logo {
+  width: clamp(132px, 12vw, 164px);
+  height: auto;
+  display: block;
+  filter: brightness(0) saturate(100%);
+}
+
+.topbar--dark .brand__logo,
+.theme--dark .brand__logo {
+  filter: none;
 }
 .topbar__actions {
   display: flex;
