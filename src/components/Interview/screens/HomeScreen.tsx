@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
 import { MockInterviewParams } from '../types';
-import { InterviewerInfo, InterviewType, LangType, DifficultyType } from '@/constants';
+import { getInterviewerInfo, InterviewType, LangType, DifficultyType } from '@/constants';
 
 interface HomeScreenProps {
   onStart: (params: MockInterviewParams) => void;
@@ -13,8 +13,8 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
   const [scenario, setScenario] = useState<number>(InterviewType.TECH_INTERVIEW);
   const [language, setLanguage] = useState<number>(LangType.ENGLISH);
   const [difficulty, setDifficulty] = useState<number>(DifficultyType.Senior);
-  
-  const [selectedInterviewInfo, setSelectedInterviewerInfo] = useState();
+
+  const selectedInterviewer = getInterviewerInfo(language);
 
   const InterviewTypeList: { id: number; text: string }[] = [
     { id: InterviewType.SCREENING_INTERVIEW, text: 'Screening Interview' },
@@ -56,10 +56,7 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
 
   const handleLanguageChange = (lang: number): void => {
     setLanguage(lang);
-    
-    const selected = InterviewerInfo.find(v => v.language === lang)
-    setSelectedInterviewerInfo(selected);  
-  }
+  };
 
   return (
     <section className="screen screen--light home-screen">
@@ -69,8 +66,8 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
           <span className="eyebrow">AI-powered practice</span>
           <h1>Walk into your next interview with confidence.</h1>
           <p>
-            Practice with {InterviewerInfo[0].name}, your realistic AI interviewer, and get focused feedback after every
-            session.
+            Practice with {selectedInterviewer.name}, your realistic AI interviewer, and get focused
+            feedback after every session.
           </p>
           <div className="benefit-row">
             <span>&#10003; Real interview questions</span>
@@ -82,11 +79,11 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
           <div className="profile-block">
             <div className="profile-visual">
               <Waveform />
-              <Avatar />
+              <Avatar interviewer={selectedInterviewer} />
               <span className="online">Online</span>
             </div>
             <h2>
-              {InterviewerInfo[0].name} <span className="verified">&#10003;</span>
+              {selectedInterviewer.name} <span className="verified">&#10003;</span>
             </h2>
             <p>
               Senior Engineering Manager
@@ -108,7 +105,10 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
             </label>
             <label>
               Language
-              <select value={language} onChange={(e) => handleLanguageChange(parseInt(e.target.value, 10))}>
+              <select
+                value={language}
+                onChange={(e) => handleLanguageChange(parseInt(e.target.value, 10))}
+              >
                 {LangTypeList.map((v, index) => (
                   <option key={index} value={v.id}>
                     {v.country}

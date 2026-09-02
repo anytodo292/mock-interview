@@ -1,8 +1,3 @@
-export const en_person_stat = `${__PUBLIC_URL__}/assets/images/emma_en.png`;
-export const en_person_anim = `${__PUBLIC_URL__}/assets/images/emma_en.gif`;
-export const en_person_name = 'Emma'
-
-
 export const InterviewType = {
   // QUICK_CALL: -1,
   TECH_INTERVIEW: 0,
@@ -45,47 +40,60 @@ export const DifficultyType = {
   Senior: 2,
 };
 
-export const InterviewerInfo = [
+export interface Interviewer {
+  language: number;
+  name: string;
+  anim: string;
+  image: string;
+}
+
+export const InterviewerInfo: Interviewer[] = [
   {
     language: LangType.ENGLISH,
     name: 'Emma',
     anim: `${__PUBLIC_URL__}/assets/images/emma_en.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/emma_en.png`
+    image: `${__PUBLIC_URL__}/assets/images/emma_en.png`,
   },
   {
     language: LangType.DUTCH,
     name: 'Daan',
-    anim: `${__PUBLIC_URL__}/assets/images/emma_en.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/emma_en.png`
+    anim: `${__PUBLIC_URL__}/assets/images/daan_nl.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/daan_nl.png`,
   },
   {
     language: LangType.FRENCH,
     name: 'Hector',
-    anim: `${__PUBLIC_URL__}/assets/images/emma_en.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/emma_en.png`
+    anim: `${__PUBLIC_URL__}/assets/images/hector_fr.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/hector_fr.png`,
   },
   {
     language: LangType.GERMAN,
     name: 'Fabian',
-    anim: `${__PUBLIC_URL__}/assets/images/emma_en.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/emma_en.png`
+    anim: `${__PUBLIC_URL__}/assets/images/fabian_de.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/fabian_de.png`,
   },
   {
     language: LangType.ITALIAN,
     name: 'Flavio',
-    anim: `${__PUBLIC_URL__}/assets/images/emma_en.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/emma_en.png`
+    anim: `${__PUBLIC_URL__}/assets/images/falvio_it.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/falvio_it.png`,
   },
   {
     language: LangType.JAPANESE,
     name: 'Ebisu',
-    anim: `${__PUBLIC_URL__}/assets/images/emma_en.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/emma_en.png`
+    anim: `${__PUBLIC_URL__}/assets/images/edius_ja.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/edius_ja.png`,
   },
   {
     language: LangType.SPANISH,
     name: 'Nestor',
-    anim: `${__PUBLIC_URL__}/assets/images/emma_en.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/emma_en.png`
+    anim: `${__PUBLIC_URL__}/assets/images/nestor_es.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/nestor_es.png`,
   },
-]
+];
+
+export function getInterviewerInfo(language: number): Interviewer {
+  return (
+    InterviewerInfo.find((interviewer) => interviewer.language === language) ?? InterviewerInfo[0]
+  );
+}

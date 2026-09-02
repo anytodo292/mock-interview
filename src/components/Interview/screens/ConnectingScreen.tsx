@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
-import { InterviewerInfo } from '@/constants';
+import { Interviewer } from '@/constants';
 
-export function ConnectingScreen(): JSX.Element {
+export function ConnectingScreen({ interviewer }: { interviewer: Interviewer }): JSX.Element {
   return (
     <section className="screen screen--dark connecting-screen">
       <TopBar dark />
@@ -16,10 +16,10 @@ export function ConnectingScreen(): JSX.Element {
         <p>Please wait while we connect you to your AI interviewer.</p>
         <div className="connection-orbit">
           <Waveform />
-          <Avatar />
+          <Avatar interviewer={interviewer} />
         </div>
         <h2>
-          {InterviewerInfo[0].name} is joining<span className="animated-dots">...</span>
+          {interviewer.name} is joining<span className="animated-dots">...</span>
         </h2>
         <div className="loading-dots">
           <i />

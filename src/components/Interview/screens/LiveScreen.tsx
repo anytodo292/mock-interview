@@ -3,9 +3,10 @@ import React from 'react';
 import { CallControls } from '../shared/CallControls';
 import { InterviewerIdentity, SpeakingPortrait, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
-import { InterviewerInfo } from '@/constants';
+import { Interviewer } from '@/constants';
 
 interface LiveScreenProps {
+  interviewer: Interviewer;
   onEnd: () => void;
   muted: boolean;
   paused: boolean;
@@ -16,6 +17,7 @@ interface LiveScreenProps {
 }
 
 export function LiveScreen({
+  interviewer,
   onEnd,
   muted,
   paused,
@@ -31,9 +33,9 @@ export function LiveScreen({
       <TopBar dark />
       <div className="interview-layout">
         <div className="video-column">
-          <InterviewerIdentity />
+          <InterviewerIdentity interviewer={interviewer} />
           <div className="video-frame">
-            <SpeakingPortrait isSpeaking={agentSpeaking && !paused} />
+            <SpeakingPortrait interviewer={interviewer} isSpeaking={agentSpeaking && !paused} />
             <div className="speaking">
               <Waveform green /> {agentSpeaking ? 'Speaking' : 'Ready'}
             </div>
@@ -47,7 +49,8 @@ export function LiveScreen({
             </span>
             <h1>Let&apos;s talk about your experience.</h1>
             <p className="question">
-              {agentMessage ?? `${InterviewerInfo[0].name} is ready. Say hello to begin your mock interview.`}
+              {agentMessage ??
+                `${interviewer.name} is ready. Say hello to begin your mock interview.`}
             </p>
           </div>
 
@@ -59,7 +62,9 @@ export function LiveScreen({
             <Waveform />
           </div>
 
-          <p className="hint">Take your time. {InterviewerInfo[0].name} will listen until you finish your answer.</p>
+          <p className="hint">
+            Take your time. {interviewer.name} will listen until you finish your answer.
+          </p>
           <CallControls
             onEnd={onEnd}
             muted={muted}
