@@ -49,6 +49,7 @@ module.exports = {
     new webpack.DefinePlugin({
       __BACKEND_API_URL__: JSON.stringify(process.env.BACKEND_API_URL || ''),
       __PUBLIC_URL__: JSON.stringify(process.env.PUBLIC_URL || ''),
+      __EXTENSION_ID__: JSON.stringify(process.env.EXTENSION_ID || '')
     }),
 
     new ForkTsCheckerWebpackPlugin({

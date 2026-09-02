@@ -1,5 +1,12 @@
 export type Screen =
-  'home' | 'connecting' | 'live' | 'thinking' | 'finished' | 'report' | 'invalid';
+  | 'home'
+  | 'connecting'
+  | 'live'
+  | 'thinking'
+  | 'finished'
+  | 'report'
+  | 'invalid'
+  | 'install-extension';
 
 export type Theme = 'light' | 'dark';
 
