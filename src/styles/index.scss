@@ -676,6 +676,7 @@ button {
   animation-duration: 0.78s;
 }
 .listening-card--inactive .waveform i,
+.listening-card--idle .waveform i,
 .interview-screen--paused .listening-card .waveform i {
   animation-play-state: paused;
   opacity: 0.28;

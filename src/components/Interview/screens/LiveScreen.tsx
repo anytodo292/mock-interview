@@ -11,6 +11,7 @@ interface LiveScreenProps {
   muted: boolean;
   paused: boolean;
   agentSpeaking: boolean;
+  userSpeaking: boolean;
   agentMessage?: string;
   onMute: () => void;
   onPause: () => void;
@@ -22,10 +23,14 @@ export function LiveScreen({
   muted,
   paused,
   agentSpeaking,
+  userSpeaking,
   agentMessage,
   onMute,
   onPause,
 }: LiveScreenProps): JSX.Element {
+  const someoneSpeaking = agentSpeaking || userSpeaking;
+  const activityInactive = paused || (muted && !agentSpeaking);
+
   return (
     <section
       className={`screen screen--dark interview-screen ${paused ? 'interview-screen--paused' : ''}`}
@@ -54,10 +59,24 @@ export function LiveScreen({
             </p>
           </div>
 
-          <div className={`listening-card ${muted || paused ? 'listening-card--inactive' : ''}`}>
+          <div
+            className={`listening-card ${activityInactive ? 'listening-card--inactive' : ''} ${!someoneSpeaking ? 'listening-card--idle' : ''}`}
+            role="status"
+            aria-live="polite"
+          >
             <div>
               <span className="mic">&#9833;</span>
-              <strong>{paused ? 'Paused' : muted ? 'Microphone muted' : 'Listening...'}</strong>
+              <strong>
+                {paused
+                  ? 'Interview paused'
+                  : agentSpeaking
+                    ? `${interviewer.name} is speaking`
+                    : muted
+                      ? 'Your microphone is muted'
+                      : userSpeaking
+                        ? 'You are speaking'
+                        : 'Ready — you can speak'}
+              </strong>
             </div>
             <Waveform />
           </div>
