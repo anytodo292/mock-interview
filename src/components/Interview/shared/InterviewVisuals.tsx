@@ -1,5 +1,6 @@
 import React from 'react';
 import { Interviewer } from '@/constants';
+import { IInterview } from '@/types';
 
 const waveHeights = [
   10, 18, 30, 16, 38, 24, 44, 20, 34, 14, 27, 42, 18, 31, 12, 22, 36, 17, 26, 10,
@@ -54,11 +55,21 @@ export function Waveform({ green = false }: { green?: boolean }): JSX.Element {
 
 export function InterviewerIdentity({
   interviewer,
-  time = '08:42',
+  interviewInfo,
+  elapsedSeconds = 0,
 }: {
   interviewer: Interviewer;
-  time?: string;
+  interviewInfo?: IInterview;
+  elapsedSeconds?: number;
 }): JSX.Element {
+  const hours = Math.floor(elapsedSeconds / 3600);
+  const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+  const seconds = elapsedSeconds % 60;
+  const elapsedTime = [hours, minutes, seconds]
+    .filter((_, index) => hours > 0 || index > 0)
+    .map((value) => value.toString().padStart(2, '0'))
+    .join(':');
+
   return (
     <div className="identity">
       <Avatar interviewer={interviewer} small />
@@ -66,11 +77,11 @@ export function InterviewerIdentity({
         <strong>
           {interviewer.name} <span className="verified">&#10003;</span>
         </strong>
-        <small>Senior Engineering Manager</small>
-        <small>Google</small>
+        <small>{interviewInfo?.position ?? '--'}</small>
+        <small>{interviewInfo?.company ?? '--'}</small>
       </div>
       <div className="identity__time">
-        {time} <i />
+        <span aria-label={`Elapsed time ${elapsedTime}`}>{elapsedTime}</span> <i />
       </div>
     </div>
   );

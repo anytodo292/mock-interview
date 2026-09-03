@@ -26,6 +26,7 @@ export default function App(): JSX.Element {
   const extensionStartedRef = useRef(false);
 
   const [screen, setScreen] = useState<Screen>(hasInterviewQuery ? 'loading' : 'invalid');
+  const [interviewInfo, setInterviewInfo] = useState<IInterview>();
   const [selectedLanguage, setSelectedLanguage] = useState<number>(LangType.ENGLISH);
   const [extensionParams, setExtensionParams] = useState<MockInterviewParams | null>(null);
   const [extensionInstalled, setExtensionInstalled] = useState<boolean | null>(
@@ -63,7 +64,7 @@ export default function App(): JSX.Element {
           setScreen('invalid');
           return;
         }
-
+        setInterviewInfo(record);
         setExtensionParams({
           language: record.lang,
           scenario: record.scenario,
@@ -149,11 +150,13 @@ export default function App(): JSX.Element {
     live: (
       <LiveScreen
         interviewer={interviewer}
+        interviewInfo={interviewInfo}
         onEnd={endInterview}
         muted={interview.muted}
         paused={interview.paused}
         agentSpeaking={interview.agentSpeaking}
         userSpeaking={interview.userSpeaking}
+        elapsedSeconds={interview.elapsedSeconds}
         agentMessage={latestAgentMessage}
         onMute={interview.toggleMute}
         onPause={interview.togglePause}
@@ -162,6 +165,8 @@ export default function App(): JSX.Element {
     thinking: (
       <ThinkingScreen
         interviewer={interviewer}
+        interviewInfo={interviewInfo}
+        elapsedSeconds={interview.elapsedSeconds}
         onEnd={endInterview}
         muted={interview.muted}
         paused={interview.paused}

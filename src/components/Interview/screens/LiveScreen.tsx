@@ -4,14 +4,17 @@ import { CallControls } from '../shared/CallControls';
 import { InterviewerIdentity, SpeakingPortrait, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
 import { Interviewer } from '@/constants';
+import { IInterview } from '@/types';
 
 interface LiveScreenProps {
   interviewer: Interviewer;
+  interviewInfo?: IInterview;
   onEnd: () => void;
   muted: boolean;
   paused: boolean;
   agentSpeaking: boolean;
   userSpeaking: boolean;
+  elapsedSeconds: number;
   agentMessage?: string;
   onMute: () => void;
   onPause: () => void;
@@ -19,11 +22,13 @@ interface LiveScreenProps {
 
 export function LiveScreen({
   interviewer,
+  interviewInfo,
   onEnd,
   muted,
   paused,
   agentSpeaking,
   userSpeaking,
+  elapsedSeconds,
   agentMessage,
   onMute,
   onPause,
@@ -38,7 +43,11 @@ export function LiveScreen({
       <TopBar dark />
       <div className="interview-layout">
         <div className="video-column">
-          <InterviewerIdentity interviewer={interviewer} />
+          <InterviewerIdentity
+            interviewer={interviewer}
+            interviewInfo={interviewInfo}
+            elapsedSeconds={elapsedSeconds}
+          />
           <div className="video-frame">
             <SpeakingPortrait interviewer={interviewer} isSpeaking={agentSpeaking && !paused} />
             <div className="speaking">

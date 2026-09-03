@@ -31,6 +31,7 @@ interface DeepgramInterview {
   paused: boolean;
   agentSpeaking: boolean;
   userSpeaking: boolean;
+  elapsedSeconds: number;
   error: string | null;
   transcript: TranscriptEntry[];
   start: (params: InterviewStartParams) => Promise<void>;
@@ -53,6 +54,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const [paused, setPaused] = useState(false);
   const [agentSpeaking, setAgentSpeaking] = useState(false);
   const [userSpeaking, setUserSpeaking] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
 
@@ -66,6 +68,10 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const transcriptIdRef = useRef(0);
   const statusBeforePauseRef = useRef<InterviewStatus>('listening');
   const playbackMonitorRef = useRef<number | null>(null);
+  const elapsedTimerRef = useRef<number | null>(null);
+  const sessionStartedAtRef = useRef<number | null>(null);
+  const pauseStartedAtRef = useRef<number | null>(null);
+  const totalPausedMsRef = useRef(0);
 
   callbacksRef.current = callbacks;
 
@@ -74,6 +80,13 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       window.clearTimeout(playbackMonitorRef.current);
       playbackMonitorRef.current = null;
     }
+    if (elapsedTimerRef.current !== null) {
+      window.clearInterval(elapsedTimerRef.current);
+      elapsedTimerRef.current = null;
+    }
+    sessionStartedAtRef.current = null;
+    pauseStartedAtRef.current = null;
+    totalPausedMsRef.current = 0;
     microphoneRef.current?.stop();
     sessionRef.current?.disconnect();
     playerRef.current?.dispose();
@@ -89,6 +102,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setPaused(false);
     setAgentSpeaking(false);
     setUserSpeaking(false);
+    setElapsedSeconds(0);
     mutedRef.current = false;
     pausedRef.current = false;
     setStatus('ended');
@@ -103,6 +117,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setPaused(false);
     setAgentSpeaking(false);
     setUserSpeaking(false);
+    setElapsedSeconds(0);
     setError(null);
     setTranscript([]);
     setStatus('idle');
@@ -117,6 +132,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       setPaused(false);
       setAgentSpeaking(false);
       setUserSpeaking(false);
+      setElapsedSeconds(0);
       mutedRef.current = false;
       pausedRef.current = false;
       setTranscript([]);
@@ -193,6 +209,22 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('settings-applied', () => {
           setUserSpeaking(false);
+          if (sessionStartedAtRef.current === null) {
+            sessionStartedAtRef.current = Date.now();
+            pauseStartedAtRef.current = null;
+            totalPausedMsRef.current = 0;
+            setElapsedSeconds(0);
+            elapsedTimerRef.current = window.setInterval(() => {
+              const startedAt = sessionStartedAtRef.current;
+              if (startedAt === null) return;
+
+              const currentPauseMs = pauseStartedAtRef.current
+                ? Date.now() - pauseStartedAtRef.current
+                : 0;
+              const activeMs = Date.now() - startedAt - totalPausedMsRef.current - currentPauseMs;
+              setElapsedSeconds(Math.max(0, Math.floor(activeMs / 1000)));
+            }, 250);
+          }
           setStatus('listening');
           callbacksRef.current.onReady();
         });
@@ -274,10 +306,15 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setPaused((currentPaused) => {
       pausedRef.current = !currentPaused;
       if (currentPaused) {
+        if (pauseStartedAtRef.current !== null) {
+          totalPausedMsRef.current += Date.now() - pauseStartedAtRef.current;
+          pauseStartedAtRef.current = null;
+        }
         player.unmute();
         if (!mutedRef.current) microphone.unmute();
         setStatus(statusBeforePauseRef.current);
       } else {
+        pauseStartedAtRef.current = Date.now();
         statusBeforePauseRef.current = status;
         setUserSpeaking(false);
         microphone.mute();
@@ -296,6 +333,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     paused,
     agentSpeaking,
     userSpeaking,
+    elapsedSeconds,
     error,
     transcript,
     start,

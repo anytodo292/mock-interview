@@ -3,10 +3,13 @@ import React from 'react';
 import { CallControls } from '../shared/CallControls';
 import { InterviewerIdentity } from '../shared/InterviewVisuals';
 import { Interviewer } from '@/constants';
+import { IInterview } from '@/types';
 import { TopBar } from '../shared/TopBar';
 
 interface ThinkingScreenProps {
   interviewer: Interviewer;
+  interviewInfo?: IInterview;
+  elapsedSeconds: number;
   onEnd: () => void;
   muted: boolean;
   paused: boolean;
@@ -16,6 +19,8 @@ interface ThinkingScreenProps {
 
 export function ThinkingScreen({
   interviewer,
+  interviewInfo,
+  elapsedSeconds,
   onEnd,
   muted,
   paused,
@@ -29,7 +34,11 @@ export function ThinkingScreen({
       <TopBar dark />
       <div className="interview-layout">
         <div className="video-column">
-          <InterviewerIdentity interviewer={interviewer} time="12:15" />
+          <InterviewerIdentity
+            interviewer={interviewer}
+            interviewInfo={interviewInfo}
+            elapsedSeconds={elapsedSeconds}
+          />
           <div className="video-frame video-frame--thinking">
             <img src={interviewer.image} alt={`${interviewer.name} considering the answer`} />
             <div className="speaking">
