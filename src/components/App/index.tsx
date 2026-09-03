@@ -5,6 +5,7 @@ import { FinishedScreen } from 'components/Interview/screens/FinishedScreen';
 import { HomeScreen } from 'components/Interview/screens/HomeScreen';
 import { InvalidInterviewScreen } from 'components/Interview/screens/InvalidInterviewScreen';
 import { InstallExtensionScreen } from 'components/Interview/screens/InstallExtensionScreen';
+import { LoadingInterviewScreen } from 'components/Interview/screens/LoadingInterviewScreen';
 import { LiveScreen } from 'components/Interview/screens/LiveScreen';
 import { ReportScreen } from 'components/Interview/screens/ReportScreen';
 import { ThinkingScreen } from 'components/Interview/screens/ThinkingScreen';
@@ -24,7 +25,7 @@ export default function App(): JSX.Element {
 
   const extensionStartedRef = useRef(false);
 
-  const [screen, setScreen] = useState<Screen>(hasInterviewQuery ? 'connecting' : 'invalid');
+  const [screen, setScreen] = useState<Screen>(hasInterviewQuery ? 'loading' : 'invalid');
   const [selectedLanguage, setSelectedLanguage] = useState<number>(LangType.ENGLISH);
   const [extensionParams, setExtensionParams] = useState<MockInterviewParams | null>(null);
   const [extensionInstalled, setExtensionInstalled] = useState<boolean | null>(
@@ -171,6 +172,7 @@ export default function App(): JSX.Element {
     report: <ReportScreen onAgain={restartInterview} />,
     invalid: <InvalidInterviewScreen />,
     'install-extension': <InstallExtensionScreen extensionId={__EXTENSION_ID__} />,
+    loading: <LoadingInterviewScreen />,
   };
 
   return (

@@ -6,7 +6,8 @@ export type Screen =
   | 'finished'
   | 'report'
   | 'invalid'
-  | 'install-extension';
+  | 'install-extension'
+  | 'loading';
 
 export type Theme = 'light' | 'dark';
 

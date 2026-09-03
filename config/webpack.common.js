@@ -3,7 +3,7 @@ const webpack = require('webpack')
 const paths = require('./paths')
 
 try {
-  process.loadEnvFile(pathtoresolve.resolve(__dirname, process.env.NODE_ENV === 'production' ? '../.env.production' : '../.env.development'))
+  process.loadEnvFile(pathtoresolve.resolve(__dirname, `../.env.${process.env.NODE_ENV}`))
 } catch (error) {
   if (error.code !== 'ENOENT') throw error
 }

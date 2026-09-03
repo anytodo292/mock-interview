@@ -9,4 +9,5 @@ export const screenDefinitions: ScreenDefinition[] = [
   { id: 'report', label: 'Detailed report' },
   { id: 'invalid', label: 'Invalid interview' },
   { id: 'install-extension', label: 'Install extension' },
+  { id: 'loading', label: 'Loading interview' },
 ];

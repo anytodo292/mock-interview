@@ -14,7 +14,7 @@ export function InvalidInterviewScreen(): JSX.Element {
             </div>
             <span className="eyebrow">Interview unavailable</span>
             <h1>This interview link isn&apos;t valid</h1>
-            <p>It may have already been started or finished, or the address may be incomplete.</p>
+            <p>It may have already been finished, or the address may be incomplete.</p>
             <div className="blocking-state__actions">
               <button className="primary-button" onClick={() => window.history.back()}>
                 &larr; Go back
