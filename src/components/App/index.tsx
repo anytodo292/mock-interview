@@ -142,6 +142,7 @@ export default function App(): JSX.Element {
     home: (
       <HomeScreen
         onStart={startInterview}
+        interviewInfo={interviewInfo}
         initialParams={extensionParams ?? undefined}
         lockInterview={fromExtension}
       />

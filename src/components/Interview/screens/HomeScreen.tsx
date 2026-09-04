@@ -4,17 +4,20 @@ import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
 import { MockInterviewParams } from '../types';
 import { getInterviewerInfo, InterviewType, LangType, DifficultyType } from '@/constants';
+import { IInterview } from '@/types';
 
 interface HomeScreenProps {
   onStart: (params: MockInterviewParams) => void;
   initialParams?: MockInterviewParams;
   lockInterview?: boolean;
+  interviewInfo?: IInterview;
 }
 
 export function HomeScreen({
   onStart,
   initialParams,
   lockInterview = false,
+  interviewInfo,
 }: HomeScreenProps): JSX.Element {
   const [scenario, setScenario] = useState<number>(
     initialParams?.scenario ?? InterviewType.TECH_INTERVIEW,
@@ -96,9 +99,9 @@ export function HomeScreen({
               {selectedInterviewer.name} <span className="verified">&#10003;</span>
             </h2>
             <p>
-              Senior Engineering Manager
+              {interviewInfo?.position?? '--'}
               <br />
-              Google &middot; 15+ years experience
+              {interviewInfo?.company?? '--'}
             </p>
           </div>
 
