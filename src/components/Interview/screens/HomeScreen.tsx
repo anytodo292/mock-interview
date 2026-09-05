@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
 import { MockInterviewParams } from '../types';
-import { getInterviewerInfo, InterviewType, LangType, DifficultyType } from '@/constants';
+import { getInterviewerInfo, InterviewType, LangType, DifficultyType, InterviewTypeList, LangTypeList, DifficultyTypeList } from '@/constants';
 import { IInterview } from '@/types';
 
 interface HomeScreenProps {
@@ -28,40 +28,6 @@ export function HomeScreen({
   );
 
   const selectedInterviewer = getInterviewerInfo(language);
-
-  const InterviewTypeList: { id: number; text: string }[] = [
-    { id: InterviewType.SCREENING_INTERVIEW, text: 'Screening Interview' },
-    { id: InterviewType.TECH_INTERVIEW, text: 'Technical Interview' },
-    { id: InterviewType.CODING_INTERVIEW, text: 'Coding Interview' },
-    { id: InterviewType.SYS_DESGIN_INTERVIEW, text: 'System Design Interview' },
-    { id: InterviewType.BEHAV_INTERVIEW, text: 'Behavioral Interview' },
-    { id: InterviewType.CASE_INTERVIEW, text: 'Case Interview' },
-    { id: InterviewType.SITUATION_INTERVIEW, text: 'Situational Interview' },
-    { id: InterviewType.CULTURE_INTERVIEW, text: 'Culture Fit Interview' },
-    { id: InterviewType.FINAL_INTERVIEW, text: 'Hiring Manager Interview' },
-    { id: InterviewType.AI_INTERVIEW, text: 'AI-Driven Interview' },
-    { id: InterviewType.TEAM_MEETING, text: 'Team Meeting' },
-    { id: InterviewType.CLIENT_MEETING, text: 'Client Meeting' },
-    { id: InterviewType.CONSULTING, text: 'Consultation Meeting' },
-    { id: InterviewType.CASUAL_CONVERSATION, text: 'Casual Conversation' },
-    // { id: InterviewType.ONLINE_ASSESSMENT, text: 'Online Assessment' },
-  ];
-
-  const LangTypeList = [
-    { id: LangType.DUTCH, country: 'Dutch (Nederlands)', deepgramCode: 'nl' },
-    { id: LangType.ENGLISH, country: 'English (US)', deepgramCode: 'en' },
-    { id: LangType.FRENCH, country: 'French (Français)', deepgramCode: 'fr' },
-    { id: LangType.GERMAN, country: 'German (Deutsch)', deepgramCode: 'de' },
-    { id: LangType.ITALIAN, country: 'Italian (Italiano)', deepgramCode: 'it' },
-    { id: LangType.JAPANESE, country: 'Japanese (日本語)', deepgramCode: 'ja' },
-    { id: LangType.SPANISH, country: 'Spanish (Español)', deepgramCode: 'es' },
-  ];
-
-  const DifficultyTypeList: { id: number; text: string }[] = [
-    { id: DifficultyType.Junior, text: 'Junior' },
-    { id: DifficultyType.Mid, text: 'Mid-Level' },
-    { id: DifficultyType.Senior, text: 'Senior' },
-  ];
 
   const handleMockInterviewStartClick = (): void => {
     onStart({ scenario, language, difficulty });
@@ -167,7 +133,7 @@ export function HomeScreen({
           </div> */}
 
           <button className="primary-button" onClick={handleMockInterviewStartClick}>
-            &#9673; Start mock interview <span>&rarr;</span>
+            Start mock interview <span>&rarr;</span>
           </button>
         </div>
       </div>

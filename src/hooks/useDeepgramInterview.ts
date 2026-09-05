@@ -7,17 +7,15 @@ import {
   ConversationTextMessage,
 } from '@deepgram/agents';
 
-import { fetchAgentBuild, fetchDeepgramToken } from '../services/deepgramApi';
-import { InterviewStartParams } from '../components/Interview/types';
+import {
+  fetchAgentBuild,
+  fetchDeepgramToken,
+  notifyInterviewStarted,
+} from '../services/deepgramApi';
+import { InterviewStartParams, InterviewTranscript } from '../components/Interview/types';
 
 export type InterviewStatus =
   'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'ended' | 'error';
-
-export interface TranscriptEntry {
-  id: number;
-  role: string;
-  content: string;
-}
 
 interface InterviewCallbacks {
   onReady: () => void;
@@ -32,8 +30,9 @@ interface DeepgramInterview {
   agentSpeaking: boolean;
   userSpeaking: boolean;
   elapsedSeconds: number;
+  sessionId: string | null;
   error: string | null;
-  transcript: TranscriptEntry[];
+  transcriptList: InterviewTranscript[];
   start: (params: InterviewStartParams) => Promise<void>;
   end: () => void;
   reset: () => void;
@@ -55,8 +54,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const [agentSpeaking, setAgentSpeaking] = useState(false);
   const [userSpeaking, setUserSpeaking] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
+  const [transcriptList, setTranscriptList] = useState<InterviewTranscript[]>([]);
 
   const sessionRef = useRef<AgentSession | null>(null);
   const microphoneRef = useRef<AgentMicrophone | null>(null);
@@ -72,6 +72,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const sessionStartedAtRef = useRef<number | null>(null);
   const pauseStartedAtRef = useRef<number | null>(null);
   const totalPausedMsRef = useRef(0);
+  const startNotificationSentRef = useRef(false);
 
   callbacksRef.current = callbacks;
 
@@ -118,13 +119,18 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setAgentSpeaking(false);
     setUserSpeaking(false);
     setElapsedSeconds(0);
+    setSessionId(null);
     setError(null);
-    setTranscript([]);
+    setTranscriptList([]);
     setStatus('idle');
   }, [releaseResources]);
 
   const start = useCallback(
-    async ({ interviewId, ...params }: InterviewStartParams): Promise<void> => {
+    async ({ msId, interviewId, ...params }: InterviewStartParams): Promise<void> => {
+      // This is the application's correlation ID for the complete interview lifecycle.
+      // Deepgram's Welcome message does not always expose a session ID.
+      const clientSessionId = crypto.randomUUID();
+
       intentionalEndRef.current = false;
       releaseResources();
       setError(null);
@@ -133,10 +139,12 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       setAgentSpeaking(false);
       setUserSpeaking(false);
       setElapsedSeconds(0);
+      setSessionId(clientSessionId);
       mutedRef.current = false;
       pausedRef.current = false;
-      setTranscript([]);
+      setTranscriptList([]);
       transcriptIdRef.current = 0;
+      startNotificationSentRef.current = false;
       setStatus('connecting');
 
       try {
@@ -164,6 +172,19 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         sessionRef.current = session;
         playerRef.current = player;
         microphoneRef.current = microphone;
+
+        const notifyStart = (): void => {
+          if (startNotificationSentRef.current || !interviewId) return;
+
+          if (!Number.isInteger(interviewId)) return;
+
+          startNotificationSentRef.current = true;
+          void notifyInterviewStarted(msId, interviewId, clientSessionId).catch(
+            (notificationError) => {
+              console.error('Interview start notification failed:', notificationError);
+            },
+          );
+        };
 
         const handleRuntimeError = (runtimeError: unknown): void => {
           intentionalEndRef.current = true;
@@ -209,6 +230,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('settings-applied', () => {
           setUserSpeaking(false);
+          notifyStart();
           if (sessionStartedAtRef.current === null) {
             sessionStartedAtRef.current = Date.now();
             pauseStartedAtRef.current = null;
@@ -229,11 +251,21 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           callbacksRef.current.onReady();
         });
         session.on('conversation-text', (message: ConversationTextMessage) => {
-          if (!message.content) return;
+          const content = message.content?.trim();
+          if (!content) return;
+
+          const role = message.role === 'agent' ? 'assistant' : message.role;
+          if (role !== 'user' && role !== 'assistant') return;
+
           transcriptIdRef.current += 1;
-          setTranscript((entries) => [
-            ...entries,
-            { id: transcriptIdRef.current, role: message.role, content: message.content },
+          setTranscriptList((prevList) => [
+            ...prevList,
+            {
+              id: transcriptIdRef.current,
+              speaker: role === 'user' ? 'you' : 'interviewer',
+              talk: content,
+              capturedAt: new Date().toISOString(),
+            },
           ]);
         });
         session.on('user-started-speaking', () => {
@@ -334,8 +366,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     agentSpeaking,
     userSpeaking,
     elapsedSeconds,
+    sessionId,
     error,
-    transcript,
+    transcriptList,
     start,
     end,
     reset,
