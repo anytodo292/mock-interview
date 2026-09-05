@@ -70,10 +70,45 @@ export function ReportScreen({
   }
 
   const sections = [
-    { title: 'Strengths', icon: '✓', points: evaluation.strengths },
-    { title: 'Areas to improve', icon: '△', points: evaluation.areas_to_improve },
-    { title: 'Suggested learning', icon: '◎', points: evaluation.suggested_learning },
-    { title: 'AI feedback', icon: '●', points: evaluation.ai_feedback },
+    {
+      title: 'Strengths',
+      icon: (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m5 12 4 4L19 6" />
+        </svg>
+      ),
+      points: evaluation.strengths,
+    },
+    {
+      title: 'Areas to improve',
+      icon: (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3 2.8 20h18.4L12 3Z" />
+          <path d="M12 9v5M12 17.5v.1" />
+        </svg>
+      ),
+      points: evaluation.areas_to_improve,
+    },
+    {
+      title: 'Suggested learning',
+      icon: (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H11v17H7.5A3.5 3.5 0 0 0 4 22V5.5Z" />
+          <path d="M20 5.5A3.5 3.5 0 0 0 16.5 2H13v17h3.5A3.5 3.5 0 0 1 20 22V5.5Z" />
+        </svg>
+      ),
+      points: evaluation.suggested_learning,
+    },
+    {
+      title: 'AI feedback',
+      icon: (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3a7 7 0 0 0-4 12.7V19h8v-3.3A7 7 0 0 0 12 3Z" />
+          <path d="M9 22h6M9 10h.01M15 10h.01M9.5 13.5a4 4 0 0 0 5 0" />
+        </svg>
+      ),
+      points: evaluation.ai_feedback,
+    },
   ];
 
   const downloadReport = (): void => {

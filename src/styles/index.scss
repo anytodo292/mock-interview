@@ -1441,6 +1441,17 @@ button {
 .report-item > button i {
   font-style: normal;
   color: #2abb6c;
+  display: inline-flex;
+  align-items: center;
+}
+.report-item > button i svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .report-item:nth-of-type(3) > button i {
   color: #f2a521;
