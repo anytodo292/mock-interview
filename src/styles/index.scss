@@ -1,11 +1,5 @@
 @use 'utilities';
 
-@font-face {
-  font-family: Inter;
-  src: url('../fonts/Inter.ttf');
-  font-display: swap;
-}
-
 :root {
   font-family: Inter, system-ui, sans-serif;
   color: #10152f;
@@ -39,7 +33,7 @@ body {
   color: #262c43;
   box-shadow: 0 7px 22px #11182f18;
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 550;
 }
 
 .theme-toggle > span:first-child {
@@ -112,7 +106,7 @@ button {
 .stage-nav::before {
   content: 'SCREEN PREVIEW';
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.13em;
   color: #8b91a7;
   margin: 0 0 8px 12px;
@@ -145,7 +139,7 @@ button {
 .stage-nav button.active {
   background: #fff;
   color: #5c3df3;
-  font-weight: 700;
+  font-weight: 500;
   box-shadow: 0 8px 30px #27305a12;
 }
 .stage-nav button.active span {
@@ -214,7 +208,7 @@ button {
 .eyebrow {
   color: #6746ef;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -226,7 +220,7 @@ button {
 .answer-button {
   min-height: 54px;
   border-radius: 12px;
-  font-weight: 750;
+  font-weight: 450;
   border: 0;
   transition:
     transform 0.2s,
@@ -267,6 +261,7 @@ button {
   letter-spacing: -0.05em;
   max-width: 700px;
   margin: 17px 0 24px;
+  font-weight: 500;
 }
 .home-copy > p {
   font-size: 18px;
@@ -280,7 +275,7 @@ button {
   gap: 20px;
   color: #343a53;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   margin-top: 30px;
 }
 .benefit-row span::first-letter {
@@ -336,11 +331,12 @@ button {
   border-radius: 20px;
   padding: 5px 12px;
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 550;
 }
 .profile-block h2 {
   font-size: 18px;
   margin: 12px 0 5px;
+  font-weight: 400;
 }
 .profile-block p {
   color: #737a92;
@@ -366,7 +362,7 @@ button {
 }
 .form-grid label {
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 550;
   text-transform: capitalize;
 }
 .form-grid select {
@@ -415,6 +411,7 @@ button {
 .connecting-content h1 {
   margin: 10px 0;
   font-size: 34px;
+  font-weight: 500;
 }
 .connecting-content > p {
   color: #c0c5d6;
@@ -454,7 +451,7 @@ button {
 }
 .connecting-content h2 {
   font-size: 16px;
-  font-weight: 550;
+  font-weight: 400;
 }
 .animated-dots {
   color: #9a69ff;
@@ -585,7 +582,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  font-weight: 700;
+  font-weight: 500;
 }
 .speaking .waveform {
   width: 34px;
@@ -615,7 +612,7 @@ button {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-weight: 750;
+  font-weight: 550;
 }
 .live-label i {
   background: #31d16f;
@@ -627,6 +624,7 @@ button {
   line-height: 1.1;
   letter-spacing: -0.04em;
   margin: 18px 0 28px;
+  font-weight: 500;
 }
 .question {
   background: linear-gradient(130deg, #17233a, #10192d);
@@ -853,7 +851,7 @@ button {
   border-radius: 50%;
   box-shadow: 0 18px 45px #25ba7b38;
   font-size: 40px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .completion-hero h1 {
@@ -861,6 +859,7 @@ button {
   font-size: clamp(38px, 4.2vw, 60px);
   line-height: 1.08;
   letter-spacing: -0.045em;
+  font-weight: 500;
 }
 
 .completion-hero p {
@@ -882,6 +881,7 @@ button {
 .completion-card h2 {
   margin: 0 0 18px;
   font-size: 20px;
+  font-weight: 400;
 }
 
 .session-summary {
@@ -905,7 +905,7 @@ button {
 .session-summary dd {
   margin: 0;
   font-size: 13px;
-  font-weight: 750;
+  font-weight: 550;
   text-align: right;
 }
 
@@ -943,6 +943,7 @@ button {
 .finished-summary-card__heading h2 {
   margin: 7px 0 0;
   font-size: clamp(21px, 2vw, 28px);
+  font-weight: 400;
 }
 
 .finished-status {
@@ -951,7 +952,7 @@ button {
   background: #e3f8ef;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   text-transform: capitalize;
 }
 
@@ -982,7 +983,7 @@ button {
   border-radius: 16px;
   box-shadow: 0 14px 30px #20cfa13d;
   font-size: 26px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .guidance-card__icon--extension {
@@ -1013,7 +1014,7 @@ button {
   background: #e9fbf5;
   border-radius: 50%;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .guidance-steps div {
@@ -1069,7 +1070,7 @@ button {
   border-radius: 18px;
   box-shadow: 0 14px 30px #20cfa13d;
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .blocking-state__icon--extension {
@@ -1082,6 +1083,7 @@ button {
   font-size: clamp(34px, 4vw, 52px);
   line-height: 1.04;
   letter-spacing: -0.04em;
+  font-weight:500;
 }
 
 .blocking-state__main > p {
@@ -1124,7 +1126,7 @@ button {
   margin-bottom: 12px;
   color: #687189;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -1151,7 +1153,7 @@ button {
   background: #e2f8f1;
   border-radius: 50%;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .blocking-state__steps li div {
@@ -1194,6 +1196,7 @@ button {
   margin: 12px 0 10px;
   font-size: clamp(30px, 4vw, 44px);
   letter-spacing: -0.035em;
+  font-weight: 500;
 }
 
 .loading-interview p {
@@ -1259,7 +1262,7 @@ button {
   padding: 7px 16px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 550;
   margin-top: -10px;
   position: relative;
 }
@@ -1268,6 +1271,7 @@ button {
   letter-spacing: -0.03em;
   margin: 24px auto 12px;
   max-width: 500px;
+  font-weight: 500;
 }
 .result-hero p {
   color: #717991;
@@ -1284,6 +1288,7 @@ button {
 }
 .score-card h2 {
   margin-top: 0;
+  font-weight: 400;
 }
 .score-row {
   display: grid;
@@ -1347,6 +1352,7 @@ button {
   margin: 8px 0;
   font-size: 36px;
   letter-spacing: -0.035em;
+  font-weight: 500;
 }
 .report-heading p {
   color: #7b8298;
@@ -1409,7 +1415,7 @@ button {
 .report-layout aside a.active {
   background: white;
   color: #6544ed;
-  font-weight: 750;
+  font-weight: 550;
   box-shadow: 0 4px 16px #292e5410;
 }
 .accordion {
@@ -1417,6 +1423,7 @@ button {
 }
 .accordion h2 {
   margin-top: 0;
+  font-weight: 400;
 }
 .report-item {
   border: 1px solid #e4e6ef;
@@ -1432,7 +1439,7 @@ button {
   padding: 17px 20px;
   display: flex;
   justify-content: space-between;
-  font-weight: 750;
+  font-weight: 550;
 }
 .report-item > button span {
   display: flex;
@@ -1501,6 +1508,7 @@ button {
 
 .report-panel__heading h2 {
   margin: 6px 0 0;
+  font-weight: 400;
 }
 
 .report-panel__heading > span {
@@ -1523,7 +1531,7 @@ button {
 
 .competency-row > div:first-child span {
   color: #697187;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .competency-track {
@@ -1604,6 +1612,7 @@ button {
   margin: 12px 0;
   font-size: clamp(32px, 4vw, 48px);
   letter-spacing: -0.04em;
+  font-weight: 500;
 }
 
 .report-state > p {

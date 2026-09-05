@@ -282,7 +282,7 @@ export function ReportScreen({
               Download report
             </button>
             <button className="secondary-button" onClick={onAgain}>
-              Start another interview
+              Practice again
             </button>
           </div>
         </div>

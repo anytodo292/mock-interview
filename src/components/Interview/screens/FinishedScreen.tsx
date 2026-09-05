@@ -130,13 +130,13 @@ export function FinishedScreen({
           </dl>
           {result.report_available ? (
             <button className="primary-button completion-card__restart" onClick={onReport}>
-              View evaluation report <span>&rarr;</span>
+              View evaluation report
             </button>
           ) : (
             <p className="report-pending">Your detailed evaluation is still being prepared.</p>
           )}
           <button className="secondary-button" onClick={onAgain}>
-            Start another interview
+            Practice again
           </button>
         </div>
       </div>

@@ -16,9 +16,6 @@ export function InvalidInterviewScreen(): JSX.Element {
             <h1>This interview link isn&apos;t valid</h1>
             <p>It may have already been finished, or the address may be incomplete.</p>
             <div className="blocking-state__actions">
-              <button className="primary-button" onClick={() => window.history.back()}>
-                &larr; Go back
-              </button>
               <button className="secondary-button" onClick={() => window.location.reload()}>
                 Try this link again
               </button>

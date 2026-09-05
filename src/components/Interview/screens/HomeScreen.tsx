@@ -133,7 +133,7 @@ export function HomeScreen({
           </div> */}
 
           <button className="primary-button" onClick={handleMockInterviewStartClick}>
-            Start mock interview <span>&rarr;</span>
+            Start mock interview
           </button>
         </div>
       </div>
