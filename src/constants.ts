@@ -40,6 +40,9 @@ export const DifficultyType = {
   Senior: 2,
 };
 
+// Change this value to adjust the maximum active interview duration.
+export const MAX_INTERVIEW_DURATION_SECONDS = 20 * 60;
+
 export const InterviewTypeList: { id: number; text: string }[] = [
   { id: InterviewType.SCREENING_INTERVIEW, text: 'Screening Interview' },
   { id: InterviewType.TECH_INTERVIEW, text: 'Technical Interview' },

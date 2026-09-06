@@ -12,6 +12,7 @@ interface FinishedScreenProps {
   onRetry: () => void;
   onReport: () => void;
   onAgain: () => void;
+  completionMessage?: string | null;
 }
 
 function formatDuration(totalSeconds: number): string {
@@ -30,6 +31,7 @@ export function FinishedScreen({
   onRetry,
   onReport,
   onAgain,
+  completionMessage,
 }: FinishedScreenProps): JSX.Element {
   if (loading) {
     return (
@@ -39,7 +41,10 @@ export function FinishedScreen({
           <div className="loading-interview__spinner" aria-hidden="true" />
           <span className="eyebrow">Finishing interview</span>
           <h1>Saving your interview...</h1>
-          <p>We&apos;re uploading the final conversation and preparing your results.</p>
+          <p>
+            {completionMessage ??
+              "We're uploading the final conversation and preparing your results."}
+          </p>
         </div>
       </section>
     );
@@ -99,7 +104,10 @@ export function FinishedScreen({
           </div>
           {/* <span className="great-job">Interview complete</span> */}
           <h1>Your mock interview is finished.</h1>
-          <p>Your responses have been saved and your evaluation is ready to review.</p>
+          <p>
+            {completionMessage ??
+              'Your responses have been saved and your evaluation is ready to review.'}
+          </p>
         </div>
 
         <div className="completion-card finished-summary-card">

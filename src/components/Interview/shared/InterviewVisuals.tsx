@@ -1,5 +1,5 @@
 import React from 'react';
-import { Interviewer } from '@/constants';
+import { Interviewer, MAX_INTERVIEW_DURATION_SECONDS } from '@/constants';
 import { IInterview } from '@/types';
 
 const waveHeights = [
@@ -62,13 +62,17 @@ export function InterviewerIdentity({
   interviewInfo?: IInterview;
   elapsedSeconds?: number;
 }): JSX.Element {
-  const hours = Math.floor(elapsedSeconds / 3600);
-  const minutes = Math.floor((elapsedSeconds % 3600) / 60);
-  const seconds = elapsedSeconds % 60;
-  const elapsedTime = [hours, minutes, seconds]
-    .filter((_, index) => hours > 0 || index > 0)
-    .map((value) => value.toString().padStart(2, '0'))
-    .join(':');
+  const formatTime = (totalSeconds: number): string => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [hours, minutes, seconds]
+      .filter((_, index) => hours > 0 || index > 0)
+      .map((value) => value.toString().padStart(2, '0'))
+      .join(':');
+  };
+  const elapsedTime = formatTime(Math.min(elapsedSeconds, MAX_INTERVIEW_DURATION_SECONDS));
+  const maximumTime = formatTime(MAX_INTERVIEW_DURATION_SECONDS);
 
   return (
     <div className="identity">
@@ -81,7 +85,10 @@ export function InterviewerIdentity({
         <small>{interviewInfo?.company ?? '--'}</small>
       </div>
       <div className="identity__time">
-        <span aria-label={`Elapsed time ${elapsedTime}`}>{elapsedTime}</span> <i />
+        <span aria-label={`${elapsedTime} elapsed of ${maximumTime} maximum`}>
+          {elapsedTime} / {maximumTime}
+        </span>{' '}
+        <i />
       </div>
     </div>
   );

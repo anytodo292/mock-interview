@@ -337,6 +337,9 @@ button {
   font-size: 18px;
   margin: 12px 0 5px;
   font-weight: 400;
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
 }
 .profile-block p {
   color: #737a92;
@@ -351,6 +354,12 @@ button {
   border-radius: 50%;
   padding: 2px 3px;
   vertical-align: middle;
+  flex-shrink: 0;
+  display: flex;
+  width: 18px;
+  height: 18px;
+  justify-content: center;
+  align-items: center;
 }
 .form-grid {
   display: grid;
@@ -523,7 +532,9 @@ button {
   margin-bottom: 24px;
 }
 .identity strong {
-  display: block;
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
 }
 .identity small {
   display: block;
@@ -1555,6 +1566,11 @@ button {
 .report-transcript {
   display: grid;
   gap: 12px;
+  max-height: 500px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-right: 8px;
 }
 
 .transcript-turn {

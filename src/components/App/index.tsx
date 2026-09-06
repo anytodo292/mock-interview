@@ -19,7 +19,12 @@ import {
   Theme,
 } from 'components/Interview/types';
 import { useDeepgramInterview } from '../../hooks/useDeepgramInterview';
-import { DifficultyType, getInterviewerInfo, LangType } from '@/constants';
+import {
+  DifficultyType,
+  getInterviewerInfo,
+  LangType,
+  MAX_INTERVIEW_DURATION_SECONDS,
+} from '@/constants';
 import {
   fetchEvaluation,
   fetchInterview,
@@ -47,6 +52,7 @@ export default function App(): JSX.Element {
   const [finishedInterview, setFinishedInterview] = useState<FinishedInterview | null>(null);
   const [finishLoading, setFinishLoading] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
+  const [completionMessage, setCompletionMessage] = useState<string | null>(null);
   const [extensionInstalled, setExtensionInstalled] = useState<boolean | null>(
     fromExtension ? null : true,
   );
@@ -177,6 +183,7 @@ export default function App(): JSX.Element {
     setEvaluationError(null);
     setFinishedInterview(null);
     setFinishError(null);
+    setCompletionMessage(null);
     setSelectedLanguage(params.language);
     setScreen('connecting');
     void interview
@@ -219,12 +226,24 @@ export default function App(): JSX.Element {
     void loadFinishedInterview();
   };
 
+  useEffect(() => {
+    const interviewIsActive = screen === 'live' || screen === 'thinking';
+    if (!interviewIsActive || interview.elapsedSeconds < MAX_INTERVIEW_DURATION_SECONDS) return;
+
+    const maximumMinutes = MAX_INTERVIEW_DURATION_SECONDS / 60;
+    setCompletionMessage(
+      `The ${maximumMinutes}-minute interview limit was reached. Your session was ended automatically and your responses are being saved.`,
+    );
+    endInterview();
+  }, [interview.elapsedSeconds, screen]);
+
   const restartInterview = (): void => {
     interview.reset();
     setEvaluation(null);
     setEvaluationError(null);
     setFinishedInterview(null);
     setFinishError(null);
+    setCompletionMessage(null);
     setScreen('home');
   };
 
@@ -306,6 +325,7 @@ export default function App(): JSX.Element {
         onRetry={() => void loadFinishedInterview()}
         onReport={viewReport}
         onAgain={restartInterview}
+        completionMessage={completionMessage}
       />
     ),
     report: (
