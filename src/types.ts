@@ -18,7 +18,7 @@ export interface RouteParams {
 }
 
 export interface IInterview extends JsonObject {
-  li_id?: number;
+  mi_id?: number;
   scenario: number;
   position: string;
   platform: number;
@@ -26,7 +26,6 @@ export interface IInterview extends JsonObject {
   trans_lang: number;
   keywords: string[];
   company: string;
-  start_at: string;
   cv: string;
   cv_id: string;
   instruct: string;
@@ -39,24 +38,10 @@ export interface IInterview extends JsonObject {
   about_client: string;
   about_service: string;
   meet_target: string;
-  call_type: number;
   link: string;
   favicon?: string;
-  url?: string;
-  trigger?: number;
-  started?: boolean;
-  autoable?: boolean;
-  translable?: boolean;
-  limit?: number;
-  stt?: boolean;
-  detail?: boolean;
-  dg_key?: string;
-  dg_model?: string;
-  ocr_key?: string;
-  aws_key?: string;
-  credit_balance?: string;
-  credit_cost?: string;
+  transcript_list: []
   transcript_count?: number;
-  retriable?: boolean;
+  evaluation?: any
 }
 

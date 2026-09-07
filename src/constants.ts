@@ -43,6 +43,24 @@ export const DifficultyType = {
 // Change this value to adjust the maximum active interview duration.
 export const MAX_INTERVIEW_DURATION_SECONDS = 20 * 60;
 
+export const InterviewStatusType = {
+  Ready: 0,
+  Active: 1,
+  Finished: 2,
+  Evaluating: 3,
+  Complete: 4,
+  Failed: 5,
+} as const;
+
+export const InterviewStatusLabels: Record<number, string> = {
+  [InterviewStatusType.Ready]: 'Ready',
+  [InterviewStatusType.Active]: 'Active',
+  [InterviewStatusType.Finished]: 'Finished',
+  [InterviewStatusType.Evaluating]: 'Evaluating',
+  [InterviewStatusType.Complete]: 'Complete',
+  [InterviewStatusType.Failed]: 'Failed',
+};
+
 export const InterviewTypeList: { id: number; text: string }[] = [
   { id: InterviewType.SCREENING_INTERVIEW, text: 'Screening Interview' },
   { id: InterviewType.TECH_INTERVIEW, text: 'Technical Interview' },

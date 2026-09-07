@@ -7,13 +7,13 @@ import {
 } from '../components/Interview/types';
 import { IInterview, JsonObject } from '@/types';
 
-const TOKEN_ENDPOINT = '/agent/get_dg_token';
-const AGENT_BUILD_ENDPOINT = '/agent/get_agent_build';
-const INTERVIEW_ENDPOINT = '/agent/get_interview';
-const UPLOAD_TRANSCRIPT_ENDPOINT = '/agent/upload_transcript';
-const START_INTERVIEW_ENDPOINT = '/agent/start';
-const EVALUATION_ENDPOINT = '/agent/evaluation';
-const FINISH_INTERVIEW_ENDPOINT = '/agent/finish';
+const TOKEN_ENDPOINT = '/practice/get_dg_token';
+const AGENT_BUILD_ENDPOINT = '/practice/get_agent_build';
+const GET_INTERVIEW_ENDPOINT = '/practice/get_interview';
+const UPLOAD_TRANSCRIPT_ENDPOINT = '/practice/upload_transcript';
+const START_INTERVIEW_ENDPOINT = '/practice/start';
+const EVALUATION_ENDPOINT = '/practice/evaluation';
+const FINISH_INTERVIEW_ENDPOINT = '/practice/finish';
 
 export interface AgentBuildConfig {
   agent: AgentSettingsObject | string;
@@ -24,7 +24,8 @@ export interface AgentBuildConfig {
 
 async function request(endpoint: string, params?: object): Promise<unknown> {
   const backendUrl = __BACKEND_API_URL__.replace(/\/$/, '');
-  const response = await fetch(`${backendUrl}${endpoint}`, {
+  const msId = localStorage.getItem("_ms-id")
+  const response = await fetch(`${backendUrl}${endpoint}?ms_id=${msId}`, {
     method: 'POST',
     body: params ? JSON.stringify(params) : undefined,
     headers: {
@@ -112,7 +113,7 @@ export async function fetchAgentBuild(
 ): Promise<AgentBuildConfig> {
   const res = await request(AGENT_BUILD_ENDPOINT, {
     ...params,
-    ...{ li_id: interviewId },
+    ...{ mi_id: interviewId },
   });
   const data = unwrap(res, ['data']);
   if (!data) throw new Error('Invalid response data.');
@@ -136,10 +137,9 @@ export async function fetchAgentBuild(
 }
 
 export async function fetchInterview(
-  msId: string,
   interviewId: number,
 ): Promise<IInterview | null> {
-  const res = await request(INTERVIEW_ENDPOINT, { ms_id: msId, li_id: interviewId });
+  const res = await request(GET_INTERVIEW_ENDPOINT, { mi_id: interviewId });
   const data = unwrap(res, ['data']);
 
   if (!data) throw Error('Invalid response data.');
@@ -156,7 +156,7 @@ export async function uploadTranscript(
   if (transcript.length === 0) return { added: false, transcript_count: 0 };
 
   const res = await request(UPLOAD_TRANSCRIPT_ENDPOINT, {
-    li_id: interviewId,
+    mi_id: interviewId,
     session_id: sessionId,
     transcript,
   });
@@ -169,13 +169,11 @@ export async function uploadTranscript(
 }
 
 export async function notifyInterviewStarted(
-  msId: string,
   interviewId: number,
   sessionId: string,
 ): Promise<{ interview_id: number, session_id: string, status: string }> {
   const res = await request(START_INTERVIEW_ENDPOINT, {
-    ms_id: msId,
-    li_id: interviewId,
+    mi_id: interviewId,
     session_id: sessionId,
   });
 
@@ -188,11 +186,11 @@ export async function notifyInterviewStarted(
 
 export async function fetchEvaluation(
   interviewId: number,
-  sessionId: string,
+  sessionId?: string,
 ): Promise<InterviewEvaluation> {
   const res = await request(EVALUATION_ENDPOINT, {
-    li_id: interviewId,
-    session_id: sessionId,
+    mi_id: interviewId,
+    ...(sessionId ? { session_id: sessionId } : {}),
   });
   const data = unwrap(res, ['data']);
   if (!data) throw new Error('Invalid response data.');
@@ -211,7 +209,7 @@ export async function finishInterview(
   sessionId: string,
 ): Promise<FinishedInterview> {
   const res = await request(FINISH_INTERVIEW_ENDPOINT, {
-    li_id: interviewId,
+    mi_id: interviewId,
     session_id: sessionId,
   });
   const data = unwrap(res, ['data']);

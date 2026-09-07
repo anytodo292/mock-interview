@@ -179,9 +179,14 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           if (!Number.isInteger(interviewId)) return;
 
           startNotificationSentRef.current = true;
-          void notifyInterviewStarted(msId, interviewId, clientSessionId).catch(
+          void notifyInterviewStarted(interviewId, clientSessionId).catch(
             (notificationError) => {
               console.error('Interview start notification failed:', notificationError);
+              handleRuntimeError(
+                new Error(
+                  `Unable to start the interview: ${getErrorMessage(notificationError)}`,
+                ),
+              );
             },
           );
         };
@@ -189,7 +194,12 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         const handleRuntimeError = (runtimeError: unknown): void => {
           intentionalEndRef.current = true;
           releaseResources();
+          setMuted(false);
+          setPaused(false);
+          setAgentSpeaking(false);
           setUserSpeaking(false);
+          mutedRef.current = false;
+          pausedRef.current = false;
           setError(getErrorMessage(runtimeError));
           setStatus('error');
         };

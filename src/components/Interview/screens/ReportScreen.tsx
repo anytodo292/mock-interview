@@ -278,12 +278,13 @@ export function ReportScreen({
           </section>
 
           <div className="report-actions">
+            <div></div>
             <button className="primary-button" onClick={downloadReport}>
               Download report
             </button>
-            <button className="secondary-button" onClick={onAgain}>
+            {/* <button className="secondary-button" onClick={onAgain}>
               Practice again
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

@@ -6,12 +6,19 @@ export function CallControls({
   onEnd,
   muted,
   paused,
+  disabled = false,
   onMute,
   onPause,
 }: CallControlsProps): JSX.Element {
   return (
     <div className="call-controls">
-      <button type="button" className={muted ? 'active' : ''} aria-pressed={muted} onClick={onMute}>
+      <button
+        type="button"
+        className={muted ? 'active' : ''}
+        aria-pressed={muted}
+        disabled={disabled}
+        onClick={onMute}
+      >
         <span>
           {muted
             ? <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -36,6 +43,7 @@ export function CallControls({
         type="button"
         className={paused ? 'active' : ''}
         aria-pressed={paused}
+        disabled={disabled}
         onClick={onPause}
       >
         <span>
@@ -53,7 +61,7 @@ export function CallControls({
         </span>
         <small>{paused ? 'Resume' : 'Pause'}</small>
       </button>
-      <button type="button" className="call-controls__end" onClick={onEnd}>
+      <button type="button" className="call-controls__end" disabled={disabled} onClick={onEnd}>
         <span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32">
             <path d="M0 0h32v32H0z" fill="none" />

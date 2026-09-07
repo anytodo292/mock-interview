@@ -54,7 +54,7 @@ export interface FinishedInterview {
   scenario: number;
   difficulty: number;
   duration_seconds: number;
-  status: string;
+  status: number;
   overall_score: number;
   report_available: boolean;
 }
@@ -68,6 +68,7 @@ export interface CallControlsProps {
   onEnd: () => void;
   muted: boolean;
   paused: boolean;
+  disabled?: boolean;
   onMute: () => void;
   onPause: () => void;
 }

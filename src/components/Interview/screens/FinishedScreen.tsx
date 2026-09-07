@@ -3,7 +3,7 @@ import React from 'react';
 import { FinishedInterview } from '../types';
 import { TopBar } from '../shared/TopBar';
 import { finishInterview } from '@/services/deepgramApi';
-import { DifficultyTypeList, InterviewTypeList } from '@/constants';
+import { DifficultyTypeList, InterviewStatusLabels, InterviewTypeList } from '@/constants';
 
 interface FinishedScreenProps {
   result: FinishedInterview | null;
@@ -79,6 +79,7 @@ export function FinishedScreen({
   const difficultyLabel =
     DifficultyTypeList.find((item) => item.id === Number(result.difficulty))?.text ??
     String(result.difficulty);
+  const statusLabel = InterviewStatusLabels[result.status] ?? 'Unknown';
 
   const score = Math.max(0, Math.min(100, Number(result.overall_score) || 0));
   const scoreAngle = score * 3.6;
@@ -116,7 +117,7 @@ export function FinishedScreen({
               <span className="eyebrow">Session summary</span>
               <h2>{scenarioLabel}</h2>
             </div>
-            <span className="finished-status">{result.status}</span>
+            <span className="finished-status">{statusLabel}</span>
           </div>
           <dl className="session-summary">
             <div>
@@ -143,9 +144,9 @@ export function FinishedScreen({
           ) : (
             <p className="report-pending">Your detailed evaluation is still being prepared.</p>
           )}
-          <button className="secondary-button" onClick={onAgain}>
+          {/* <button className="secondary-button" onClick={onAgain}>
             Practice again
-          </button>
+          </button> */}
         </div>
       </div>
     </section>

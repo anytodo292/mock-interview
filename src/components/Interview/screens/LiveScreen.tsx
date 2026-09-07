@@ -15,6 +15,7 @@ interface LiveScreenProps {
   agentSpeaking: boolean;
   userSpeaking: boolean;
   elapsedSeconds: number;
+  controlsDisabled?: boolean;
   agentMessage?: string;
   onMute: () => void;
   onPause: () => void;
@@ -29,6 +30,7 @@ export function LiveScreen({
   agentSpeaking,
   userSpeaking,
   elapsedSeconds,
+  controlsDisabled = false,
   agentMessage,
   onMute,
   onPause,
@@ -97,6 +99,7 @@ export function LiveScreen({
             onEnd={onEnd}
             muted={muted}
             paused={paused}
+            disabled={controlsDisabled}
             onMute={onMute}
             onPause={onPause}
           />

@@ -10,6 +10,7 @@ interface ThinkingScreenProps {
   interviewer: Interviewer;
   interviewInfo?: IInterview;
   elapsedSeconds: number;
+  controlsDisabled?: boolean;
   onEnd: () => void;
   muted: boolean;
   paused: boolean;
@@ -21,6 +22,7 @@ export function ThinkingScreen({
   interviewer,
   interviewInfo,
   elapsedSeconds,
+  controlsDisabled = false,
   onEnd,
   muted,
   paused,
@@ -69,6 +71,7 @@ export function ThinkingScreen({
             onEnd={onEnd}
             muted={muted}
             paused={paused}
+            disabled={controlsDisabled}
             onMute={onMute}
             onPause={onPause}
           />

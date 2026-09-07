@@ -768,6 +768,10 @@ button {
   outline: 3px solid #a995ff;
   outline-offset: 3px;
 }
+.call-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
 .interview-screen--paused .brain span,
 .interview-screen--paused .analysis-lines i {
   animation-play-state: paused;

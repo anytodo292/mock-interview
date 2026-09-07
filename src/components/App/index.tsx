@@ -36,8 +36,9 @@ import { IInterview } from '@/types';
 export default function App(): JSX.Element {
   const search = useMemo(() => new URLSearchParams(window.location.search), []);
   const fromExtension = search.get('from') === 'extension';
-  const interviewId = Number(search.get('li_id'));
-  const msId = String(search.get('ms_id'));
+  const interviewId = Number(search.get('mi_id'));
+  const msId = search.get('ms_id') ?? '';
+  const evaluationRoute = search.get('route')?.toLowerCase() === 'evaluation';
   const hasInterviewQuery = fromExtension && Boolean(interviewId) && Boolean(msId);
 
   const extensionStartedRef = useRef(false);
@@ -124,7 +125,26 @@ export default function App(): JSX.Element {
       return;
     }
 
-    void fetchInterview(msId, interviewId).then(
+    localStorage.setItem("_ms-id", msId);
+
+    if (evaluationRoute) {
+      setScreen('report');
+      setEvaluationLoading(true);
+      setEvaluationError(null);
+      void fetchEvaluation(interviewId).then(
+        (report) => setEvaluation(report),
+        (evaluationRequestError: unknown) => {
+          setEvaluationError(
+            evaluationRequestError instanceof Error
+              ? evaluationRequestError.message
+              : 'Unable to load the evaluation report.',
+          );
+        },
+      ).finally(() => setEvaluationLoading(false));
+      return;
+    }
+
+    void fetchInterview(interviewId).then(
       (record: IInterview | null) => {
         if (!record) {
           setScreen('invalid');
@@ -143,7 +163,7 @@ export default function App(): JSX.Element {
         setScreen('invalid');
       },
     );
-  }, [extensionInstalled, hasInterviewQuery, interviewId, msId]);
+  }, [evaluationRoute, extensionInstalled, hasInterviewQuery, interviewId, msId]);
 
   useEffect(() => {
     if (!hasInterviewQuery) return;
@@ -248,7 +268,7 @@ export default function App(): JSX.Element {
   };
 
   const loadEvaluation = useCallback(async (): Promise<void> => {
-    if (!Number.isInteger(interviewId) || !interview.sessionId) {
+    if (!Number.isInteger(interviewId) || (!interview.sessionId && !evaluationRoute)) {
       setEvaluationError('The interview session information is unavailable.');
       return;
     }
@@ -257,7 +277,7 @@ export default function App(): JSX.Element {
     setEvaluationError(null);
     try {
       await uploadPendingTranscripts();
-      const report = await fetchEvaluation(interviewId, interview.sessionId);
+      const report = await fetchEvaluation(interviewId, interview.sessionId ?? undefined);
       setEvaluation(report);
     } catch (evaluationRequestError) {
       setEvaluationError(
@@ -268,7 +288,7 @@ export default function App(): JSX.Element {
     } finally {
       setEvaluationLoading(false);
     }
-  }, [interview.sessionId, interviewId, uploadPendingTranscripts]);
+  }, [evaluationRoute, interview.sessionId, interviewId, uploadPendingTranscripts]);
 
   const viewReport = (): void => {
     setScreen('report');
@@ -300,6 +320,7 @@ export default function App(): JSX.Element {
         agentSpeaking={interview.agentSpeaking}
         userSpeaking={interview.userSpeaking}
         elapsedSeconds={interview.elapsedSeconds}
+        controlsDisabled={interview.status === 'error'}
         agentMessage={latestAgentMessage}
         onMute={interview.toggleMute}
         onPause={interview.togglePause}
@@ -310,6 +331,7 @@ export default function App(): JSX.Element {
         interviewer={interviewer}
         interviewInfo={interviewInfo}
         elapsedSeconds={interview.elapsedSeconds}
+        controlsDisabled={interview.status === 'error'}
         onEnd={endInterview}
         muted={interview.muted}
         paused={interview.paused}
