@@ -347,6 +347,22 @@ button {
   font-size: 13px;
   margin: 0 0 22px;
 }
+.profile-labels {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 8px 0 10px;
+}
+.profile-labels span {
+  padding: 5px 10px;
+  border: 1px solid #dfe2ed;
+  border-radius: 7px;
+  color: #555d74;
+  background: #f6f7fb;
+  font-size: 11px;
+  line-height: 1.2;
+}
 .verified {
   font-size: 10px;
   background: #5b49f5;
@@ -368,6 +384,9 @@ button {
 }
 .form-grid label:first-child {
   grid-column: 1 / -1;
+}
+.form-grid--setup label:first-child {
+  grid-column: auto;
 }
 .form-grid label {
   font-size: 12px;
@@ -1098,7 +1117,7 @@ button {
   font-size: clamp(34px, 4vw, 52px);
   line-height: 1.04;
   letter-spacing: -0.04em;
-  font-weight:500;
+  font-weight: 500;
 }
 
 .blocking-state__main > p {
@@ -1698,6 +1717,12 @@ button {
   .guidance-steps small,
   .guidance-note {
     color: #92a9ae;
+  }
+
+  .profile-labels span {
+    color: #b7c9cc;
+    background: #111f27;
+    border-color: #294049;
   }
 
   .benefit-row,

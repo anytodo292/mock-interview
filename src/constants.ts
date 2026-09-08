@@ -96,59 +96,65 @@ export const DifficultyTypeList: { id: number; text: string }[] = [
 ];
 
 export interface Interviewer {
-  language: number;
+  gender: 'm' | 'f';
   name: string;
-  anim: string;
+  anim_speak: string;
+  anim_listen: string;
   image: string;
 }
 
 export const InterviewerInfo: Interviewer[] = [
   {
-    language: LangType.ENGLISH,
     name: 'Emma',
-    anim: `${__PUBLIC_URL__}/assets/images/emma_en.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/emma_en.png`,
+    gender: 'f',
+    anim_speak: `${__PUBLIC_URL__}/assets/images/emma_speak.gif`,
+    anim_listen: `${__PUBLIC_URL__}/assets/images/emma_listen.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/emma.png`,
   },
   {
-    language: LangType.DUTCH,
     name: 'Daan',
-    anim: `${__PUBLIC_URL__}/assets/images/daan_nl.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/daan_nl.png`,
+    gender: 'm',
+    anim_speak: `${__PUBLIC_URL__}/assets/images/daan_speak.gif`,
+    anim_listen: `${__PUBLIC_URL__}/assets/images/daan_listen.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/daan.png`,
   },
   {
-    language: LangType.FRENCH,
     name: 'Hector',
-    anim: `${__PUBLIC_URL__}/assets/images/hector_fr.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/hector_fr.png`,
+    gender: 'f',
+    anim_speak: `${__PUBLIC_URL__}/assets/images/hector_speak.gif`,
+    anim_listen: `${__PUBLIC_URL__}/assets/images/hector_listen.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/hector.png`,
   },
   {
-    language: LangType.GERMAN,
     name: 'Fabian',
-    anim: `${__PUBLIC_URL__}/assets/images/fabian_de.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/fabian_de.png`,
+    gender: 'm',
+    anim_speak: `${__PUBLIC_URL__}/assets/images/fabian_speak.gif`,
+    anim_listen: `${__PUBLIC_URL__}/assets/images/fabian_listen.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/fabian.png`,
   },
   {
-    language: LangType.ITALIAN,
     name: 'Flavio',
-    anim: `${__PUBLIC_URL__}/assets/images/falvio_it.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/falvio_it.png`,
+    gender: 'm',
+    anim_speak: `${__PUBLIC_URL__}/assets/images/falvio_speak.gif`,
+    anim_listen: `${__PUBLIC_URL__}/assets/images/falvio_listen.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/falvio.png`,
   },
   {
-    language: LangType.JAPANESE,
     name: 'Ebisu',
-    anim: `${__PUBLIC_URL__}/assets/images/edius_ja.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/edius_ja.png`,
+    gender: 'f',
+    anim_speak: `${__PUBLIC_URL__}/assets/images/ebius_speak.gif`,
+    anim_listen: `${__PUBLIC_URL__}/assets/images/ebius_listen.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/ebius.png`,
   },
   {
-    language: LangType.SPANISH,
     name: 'Nestor',
-    anim: `${__PUBLIC_URL__}/assets/images/nestor_es.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/nestor_es.png`,
+    gender: 'm',
+    anim_speak: `${__PUBLIC_URL__}/assets/images/nestor_speak.gif`,
+    anim_listen: `${__PUBLIC_URL__}/assets/images/nestor_listen.gif`,
+    image: `${__PUBLIC_URL__}/assets/images/nestor.png`,
   },
 ];
 
-export function getInterviewerInfo(language: number): Interviewer {
-  return (
-    InterviewerInfo.find((interviewer) => interviewer.language === language) ?? InterviewerInfo[0]
-  );
+export function getInterviewerInfo(selectedIndex: number): Interviewer {
+  return InterviewerInfo[selectedIndex] ?? InterviewerInfo[0];
 }

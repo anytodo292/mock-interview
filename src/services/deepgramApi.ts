@@ -6,6 +6,7 @@ import {
   MockInterviewParams,
 } from '../components/Interview/types';
 import { IInterview, JsonObject } from '@/types';
+import { getInterviewerInfo } from '@/constants';
 
 const TOKEN_ENDPOINT = '/practice/get_dg_token';
 const AGENT_BUILD_ENDPOINT = '/practice/get_agent_build';
@@ -112,7 +113,8 @@ export async function fetchAgentBuild(
   interviewId: number,
 ): Promise<AgentBuildConfig> {
   const res = await request(AGENT_BUILD_ENDPOINT, {
-    ...params,
+    difficulty: params.difficulty,
+    gender: getInterviewerInfo(params.interviewerIndex).gender,
     ...{ mi_id: interviewId },
   });
   const data = unwrap(res, ['data']);

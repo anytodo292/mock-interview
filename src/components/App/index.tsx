@@ -46,6 +46,7 @@ export default function App(): JSX.Element {
   const [screen, setScreen] = useState<Screen>(hasInterviewQuery ? 'loading' : 'invalid');
   const [interviewInfo, setInterviewInfo] = useState<IInterview>();
   const [selectedLanguage, setSelectedLanguage] = useState<number>(LangType.ENGLISH);
+  const [selectedInterviewerIndex, setSelectedInterviewerIndex] = useState(0);
   const [extensionParams, setExtensionParams] = useState<MockInterviewParams | null>(null);
   const [evaluation, setEvaluation] = useState<InterviewEvaluation | null>(null);
   const [evaluationLoading, setEvaluationLoading] = useState(false);
@@ -125,22 +126,24 @@ export default function App(): JSX.Element {
       return;
     }
 
-    localStorage.setItem("_ms-id", msId);
+    localStorage.setItem('_ms-id', msId);
 
     if (evaluationRoute) {
       setScreen('report');
       setEvaluationLoading(true);
       setEvaluationError(null);
-      void fetchEvaluation(interviewId).then(
-        (report) => setEvaluation(report),
-        (evaluationRequestError: unknown) => {
-          setEvaluationError(
-            evaluationRequestError instanceof Error
-              ? evaluationRequestError.message
-              : 'Unable to load the evaluation report.',
-          );
-        },
-      ).finally(() => setEvaluationLoading(false));
+      void fetchEvaluation(interviewId)
+        .then(
+          (report) => setEvaluation(report),
+          (evaluationRequestError: unknown) => {
+            setEvaluationError(
+              evaluationRequestError instanceof Error
+                ? evaluationRequestError.message
+                : 'Unable to load the evaluation report.',
+            );
+          },
+        )
+        .finally(() => setEvaluationLoading(false));
       return;
     }
 
@@ -155,6 +158,7 @@ export default function App(): JSX.Element {
           language: record.lang,
           scenario: record.scenario,
           difficulty: DifficultyType.Mid,
+          interviewerIndex: 0,
         });
         setSelectedLanguage(record.lang);
         setScreen('home');
@@ -205,12 +209,13 @@ export default function App(): JSX.Element {
     setFinishError(null);
     setCompletionMessage(null);
     setSelectedLanguage(params.language);
+    setSelectedInterviewerIndex(params.interviewerIndex);
     setScreen('connecting');
     void interview
       .start({
         ...params,
         ...{ interviewId },
-        ...{ msId }
+        ...{ msId },
       })
       .catch(() => {
         // The hook exposes a user-facing error and owns resource cleanup.
@@ -298,7 +303,7 @@ export default function App(): JSX.Element {
   const latestAgentMessage = interview.transcriptList
     .filter(({ speaker }) => speaker === 'interviewer')
     .slice(-1)[0]?.talk;
-  const interviewer = getInterviewerInfo(selectedLanguage);
+  const interviewer = getInterviewerInfo(selectedInterviewerIndex);
 
   const screenViews: Record<Screen, JSX.Element> = {
     home: (

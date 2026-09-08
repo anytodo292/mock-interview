@@ -15,6 +15,7 @@ export interface MockInterviewParams {
   scenario: number;
   language: number;
   difficulty: number;
+  interviewerIndex: number;
 }
 
 export interface InterviewStartParams extends MockInterviewParams {

@@ -3,7 +3,16 @@ import React, { useState } from 'react';
 import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
 import { MockInterviewParams } from '../types';
-import { getInterviewerInfo, InterviewType, LangType, DifficultyType, InterviewTypeList, LangTypeList, DifficultyTypeList } from '@/constants';
+import {
+  getInterviewerInfo,
+  InterviewType,
+  LangType,
+  DifficultyType,
+  InterviewTypeList,
+  LangTypeList,
+  DifficultyTypeList,
+  InterviewerInfo,
+} from '@/constants';
 import { IInterview } from '@/types';
 
 interface HomeScreenProps {
@@ -16,25 +25,24 @@ interface HomeScreenProps {
 export function HomeScreen({
   onStart,
   initialParams,
-  lockInterview = false,
   interviewInfo,
 }: HomeScreenProps): JSX.Element {
-  const [scenario, setScenario] = useState<number>(
-    initialParams?.scenario ?? InterviewType.TECH_INTERVIEW,
+  const scenario = initialParams?.scenario ?? InterviewType.TECH_INTERVIEW;
+  const [selectedInterviewerIdx, setSelectedInterviewerIdx] = useState<number>(
+    initialParams?.interviewerIndex ?? 0,
   );
-  const [language, setLanguage] = useState<number>(initialParams?.language ?? LangType.ENGLISH);
+  const language = initialParams?.language ?? LangType.ENGLISH;
   const [difficulty, setDifficulty] = useState<number>(
     initialParams?.difficulty ?? DifficultyType.Senior,
   );
-
-  const selectedInterviewer = getInterviewerInfo(language);
+  const selectedInterviewer = getInterviewerInfo(selectedInterviewerIdx);
+  const interviewTypeLabel =
+    InterviewTypeList.find((item) => item.id === scenario)?.text ?? 'Interview';
+  const languageLabel =
+    LangTypeList.find((item) => item.id === language)?.country ?? 'Unknown language';
 
   const handleMockInterviewStartClick = (): void => {
-    onStart({ scenario, language, difficulty });
-  };
-
-  const handleLanguageChange = (lang: number): void => {
-    setLanguage(lang);
+    onStart({ scenario, language, difficulty, interviewerIndex: selectedInterviewerIdx });
   };
 
   return (
@@ -64,38 +72,27 @@ export function HomeScreen({
             <h2>
               {selectedInterviewer.name} <span className="verified">&#10003;</span>
             </h2>
+            <div className="profile-labels" aria-label="Interview details">
+              <span>{interviewTypeLabel}</span>
+              <span>{languageLabel}</span>
+            </div>
             <p>
-              {interviewInfo?.position?? '--'}
+              {interviewInfo?.position ?? '--'}
               <br />
-              {interviewInfo?.company?? '--'}
+              {interviewInfo?.company ?? '--'}
             </p>
           </div>
 
-          <div className="form-grid u-mb-4">
+          <div className="form-grid form-grid--setup u-mb-4">
             <label>
-              Interview type
+              Interviewer
               <select
-                value={scenario}
-                disabled={lockInterview}
-                onChange={(e) => setScenario(parseInt(e.target.value, 10))}
+                value={selectedInterviewerIdx}
+                onChange={(e) => setSelectedInterviewerIdx(Number(e.target.value))}
               >
-                {InterviewTypeList.map((v, index) => (
-                  <option key={index} value={v.id}>
-                    {v.text}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Language
-              <select
-                value={language}
-                disabled={lockInterview}
-                onChange={(e) => handleLanguageChange(parseInt(e.target.value, 10))}
-              >
-                {LangTypeList.map((v, index) => (
-                  <option key={index} value={v.id}>
-                    {v.country}
+                {InterviewerInfo.map((v, index) => (
+                  <option key={v.name} value={index}>
+                    {v.name}
                   </option>
                 ))}
               </select>

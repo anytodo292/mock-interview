@@ -33,7 +33,7 @@ export function SpeakingPortrait({
     <img
       key={isSpeaking ? 'speaking' : 'idle'}
       className="portrait-frame portrait-frame--visible"
-      src={isSpeaking ? interviewer.anim : interviewer.image}
+      src={isSpeaking ? interviewer.anim_speak : interviewer.anim_listen}
       alt={
         isSpeaking
           ? `${interviewer.name} speaking`

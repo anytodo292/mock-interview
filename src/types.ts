@@ -23,12 +23,9 @@ export interface IInterview extends JsonObject {
   position: string;
   platform: number;
   lang: number;
-  trans_lang: number;
-  keywords: string[];
   company: string;
   cv: string;
   cv_id: string;
-  instruct: string;
   jd: string;
   jd_url: string;
   proj_desc: string;
