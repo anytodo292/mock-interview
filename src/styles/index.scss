@@ -37,7 +37,13 @@ body {
 }
 
 .theme-toggle > span:first-child {
-  font-size: 16px;
+  display: grid;
+  place-items: center;
+}
+
+.theme-toggle svg {
+  width: 17px;
+  height: 17px;
 }
 
 .theme-toggle:focus-visible {
@@ -281,6 +287,16 @@ button {
 .benefit-row span::first-letter {
   color: #26b765;
 }
+.benefit-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.benefit-row svg {
+  width: 14px;
+  height: 14px;
+  color: #26b765;
+}
 .setup-card {
   width: min(560px, 100%);
   justify-self: end;
@@ -351,6 +367,12 @@ button {
   border-color: #8369f4;
   transform: scale(1.05);
 }
+.slider-arrow svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: auto;
+}
 .interviewer-track {
   display: flex;
   gap: 10px;
@@ -408,8 +430,9 @@ button {
   position: absolute;
   right: -1px;
   bottom: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 19px;
   height: 19px;
   border: 2px solid #fff;
@@ -418,6 +441,10 @@ button {
   background: #6544ed;
   font-size: 9px;
   font-style: normal;
+}
+.interviewer-option__portrait i svg {
+  width: 11px;
+  height: 11px;
 }
 .interview-summary {
   margin: 18px 0;
@@ -507,6 +534,10 @@ button {
   height: 18px;
   justify-content: center;
   align-items: center;
+}
+.verified svg {
+  width: 12px;
+  height: 12px;
 }
 .form-grid {
   display: grid;
@@ -815,6 +846,10 @@ button {
   place-items: center;
   border-radius: 50%;
 }
+.mic svg {
+  width: 16px;
+  height: 16px;
+}
 .listening-card .waveform {
   margin-top: 17px;
 }
@@ -957,9 +992,13 @@ button {
     0 0 50px #6744ef33;
 }
 .brain span {
-  font-size: 65px;
   color: #8b59ff;
   animation: pulse 1.7s infinite;
+}
+.brain svg {
+  display: block;
+  width: 66px;
+  height: 66px;
 }
 .analysis-lines {
   display: flex;

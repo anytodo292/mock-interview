@@ -21,6 +21,29 @@ interface HomeScreenProps {
   interviewInfo?: IInterview;
 }
 
+function CheckIcon(): JSX.Element {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path d="m3 8.25 3.1 3.1L13 4.75" fill="none" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function ChevronIcon({ direction }: { direction: 'left' | 'right' }): JSX.Element {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d={direction === 'left' ? 'm12.5 4.5-5 5.5 5 5.5' : 'm7.5 4.5 5 5.5-5 5.5'}
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
 export function HomeScreen({
   onStart,
   initialParams,
@@ -72,8 +95,12 @@ export function HomeScreen({
             feedback after every session.
           </p>
           <div className="benefit-row">
-            <span>&#10003; Real interview questions</span>
-            <span>&#10003; Instant coaching report</span>
+            <span>
+              <CheckIcon /> Real interview questions
+            </span>
+            <span>
+              <CheckIcon /> Instant coaching report
+            </span>
           </div>
         </div>
 
@@ -96,7 +123,7 @@ export function HomeScreen({
                 aria-label="Select previous interviewer"
                 onClick={() => moveInterviewerSelection(-1)}
               >
-                &#8249;
+                <ChevronIcon direction="left" />
               </button>
               <div className="interviewer-track" role="list" aria-label="Available interviewers">
                 {InterviewerInfo.map((interviewer, index) => {
@@ -115,7 +142,11 @@ export function HomeScreen({
                     >
                       <span className="interviewer-option__portrait">
                         <img src={interviewer.image} alt="" />
-                        {selected && <i aria-hidden="true">&#10003;</i>}
+                        {selected && (
+                          <i>
+                            <CheckIcon />
+                          </i>
+                        )}
                       </span>
                       <span>{interviewer.name}</span>
                     </button>
@@ -128,7 +159,7 @@ export function HomeScreen({
                 aria-label="Select next interviewer"
                 onClick={() => moveInterviewerSelection(1)}
               >
-                &#8250;
+                <ChevronIcon direction="right" />
               </button>
             </div>
           </div>
@@ -141,11 +172,19 @@ export function HomeScreen({
             <dl className="interview-meta">
               <div>
                 <dt>Position</dt>
-                <dd>{interviewInfo?.position ?? 'Not specified'}</dd>
+                <dd>
+                  {interviewInfo?.position && interviewInfo.position.length > 0
+                    ? interviewInfo.position
+                    : '--'}
+                </dd>
               </div>
               <div>
                 <dt>Company</dt>
-                <dd>{interviewInfo?.company ?? 'Not specified'}</dd>
+                <dd>
+                  {interviewInfo?.company && interviewInfo.company.length > 0
+                    ? interviewInfo.company
+                    : '--'}
+                </dd>
               </div>
             </dl>
           </div>

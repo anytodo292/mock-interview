@@ -76,7 +76,18 @@ export function LiveScreen({
             aria-live="polite"
           >
             <div>
-              <span className="mic">&#9833;</span>
+              <span className="mic">
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path
+                    d="M8 14.5V5.8l7-1.5v8.2M8 8l7-1.5M8 14.5c0 1.1-1.1 2-2.5 2S3 15.6 3 14.5s1.1-2 2.5-2 2.5.9 2.5 2Zm7-2c0 1.1-1.1 2-2.5 2s-2.5-.9-2.5-2 1.1-2 2.5-2 2.5.9 2.5 2Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+              </span>
               <strong>
                 {paused
                   ? 'Interview paused'

@@ -79,7 +79,12 @@ export function InterviewerIdentity({
       <Avatar interviewer={interviewer} small />
       <div>
         <strong>
-          {interviewer.name} <span className="verified">&#10003;</span>
+          {interviewer.name}{' '}
+          <span className="verified">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="m3 8.25 3.1 3.1L13 4.75" fill="none" stroke="currentColor" strokeWidth="2" />
+            </svg>
+          </span>
         </strong>
         <small>{interviewInfo?.position ?? '--'}</small>
         <small>{interviewInfo?.company ?? '--'}</small>
