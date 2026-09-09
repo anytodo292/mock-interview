@@ -118,7 +118,7 @@ export default function App(): JSX.Element {
   }, [theme]);
 
   useEffect(() => {
-    if (!hasInterviewQuery || extensionInstalled !== true || extensionStartedRef.current) return;
+    if (!hasInterviewQuery || extensionStartedRef.current) return;
     extensionStartedRef.current = true;
 
     if (!msId || !interviewId) {
@@ -167,10 +167,10 @@ export default function App(): JSX.Element {
         setScreen('invalid');
       },
     );
-  }, [evaluationRoute, extensionInstalled, hasInterviewQuery, interviewId, msId]);
+  }, [evaluationRoute, hasInterviewQuery, interviewId, msId]);
 
   useEffect(() => {
-    if (!hasInterviewQuery) return;
+    if (hasInterviewQuery) return;
 
     if (typeof chrome === 'undefined' || !chrome.runtime?.sendMessage || !__EXTENSION_ID__) {
       setExtensionInstalled(false);
