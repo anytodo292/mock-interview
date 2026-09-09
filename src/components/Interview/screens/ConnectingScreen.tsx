@@ -18,9 +18,9 @@ export function ConnectingScreen({ interviewer }: { interviewer: Interviewer }):
           <Waveform />
           <Avatar interviewer={interviewer} />
         </div>
-        <h2>
+        {/* <h2>
           {interviewer.name} is joining<span className="animated-dots">...</span>
-        </h2>
+        </h2> */}
         <div className="loading-dots">
           <i />
           <i />

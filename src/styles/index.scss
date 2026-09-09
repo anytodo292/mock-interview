@@ -416,8 +416,8 @@ button {
 }
 .interviewer-option__portrait img {
   display: block;
-  width: 62px;
-  height: 62px;
+  width: 82px;
+  height: 82px;
   border: 3px solid #e0e3ee;
   border-radius: 50%;
   object-fit: cover;
@@ -649,6 +649,7 @@ button {
 .loading-dots {
   display: flex;
   gap: 10px;
+  margin-top: 15px;
 }
 .loading-dots i {
   width: 11px;

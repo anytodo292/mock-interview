@@ -40,7 +40,7 @@ export function FinishedScreen({
         <div className="report-state" role="status" aria-live="polite">
           <div className="loading-interview__spinner" aria-hidden="true" />
           <span className="eyebrow">Finishing interview</span>
-          <h1>Saving your interview...</h1>
+          <h1>Wrapping up your interview...</h1>
           <p>
             {completionMessage ??
               "We're uploading the final conversation and preparing your results."}
