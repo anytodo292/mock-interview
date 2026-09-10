@@ -28,21 +28,21 @@ export function InvalidInterviewScreen(): JSX.Element {
                 <span>1</span>
                 <div>
                   <strong>Return to NTRO</strong>
-                  <small>Open the extension that created this interview.</small>
+                  <small>Open the extension you used to create this mock interview.</small>
                 </div>
               </li>
               <li>
                 <span>2</span>
                 <div>
-                  <strong>Check its status</strong>
-                  <small>Make sure it is active and has not been completed.</small>
+                  <strong>Check mock interview status</strong>
+                  <small>Open the "Practice" tab and make sure the mock interview is not marked as completed.</small>
                 </div>
               </li>
               <li>
                 <span>3</span>
                 <div>
                   <strong>Launch it again</strong>
-                  <small>Use the fresh interview link from NTRO.</small>
+                  <small>Select the mock interview and start again it using a valid link provided by NTRO.</small>
                 </div>
               </li>
             </ol>
