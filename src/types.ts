@@ -19,6 +19,7 @@ export interface RouteParams {
 
 export interface IInterview extends JsonObject {
   mi_id?: number;
+  status?: number;
   scenario: number;
   position: string;
   platform: number;

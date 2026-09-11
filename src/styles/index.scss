@@ -1764,7 +1764,40 @@ button {
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
-  padding-right: 8px;
+  padding-right: 10px;
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 transparent;
+}
+
+/* Chrome, Edge, and Safari */
+.report-transcript::-webkit-scrollbar {
+  width: 8px;
+}
+
+.report-transcript::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+}
+
+.report-transcript::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+  min-height: 40px;
+}
+
+.report-transcript::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+  background-clip: padding-box;
+}
+
+.report-transcript::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .transcript-turn {

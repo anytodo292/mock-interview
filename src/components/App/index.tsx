@@ -22,6 +22,7 @@ import { useDeepgramInterview } from '../../hooks/useDeepgramInterview';
 import {
   DifficultyType,
   getInterviewerInfo,
+  InterviewStatusType,
   LangType,
   MAX_INTERVIEW_DURATION_SECONDS,
 } from '@/constants';
@@ -29,6 +30,7 @@ import {
   fetchEvaluation,
   fetchInterview,
   finishInterview,
+  syncInterviewStatusCookie,
   uploadTranscript,
 } from '../../services/deepgramApi';
 import { IInterview } from '@/types';
@@ -118,6 +120,8 @@ export default function App(): JSX.Element {
   }, [theme]);
 
   useEffect(() => {
+    syncInterviewStatusCookie(InterviewStatusType.Ready);
+
     if (!hasInterviewQuery || extensionStartedRef.current) return;
     extensionStartedRef.current = true;
 
@@ -161,6 +165,9 @@ export default function App(): JSX.Element {
           interviewerIndex: 0,
         });
         setSelectedLanguage(record.lang);
+        if (record.status === InterviewStatusType.Active) 
+          syncInterviewStatusCookie(InterviewStatusType.Ready);
+
         setScreen('home');
       },
       () => {

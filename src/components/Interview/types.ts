@@ -37,6 +37,7 @@ export interface EvaluationCompetency {
 
 export interface InterviewEvaluation {
   interview_id: number;
+  status: number;
   scenario: number;
   difficulty: number;
   duration_seconds: number;

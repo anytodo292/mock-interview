@@ -1,4 +1,5 @@
 import { AgentSessionConfig, AgentSettingsObject } from '@deepgram/agents';
+import Cookies from 'js-cookie';
 import {
   InterviewEvaluation,
   FinishedInterview,
@@ -15,6 +16,7 @@ const UPLOAD_TRANSCRIPT_ENDPOINT = '/practice/upload_transcript';
 const START_INTERVIEW_ENDPOINT = '/practice/start';
 const EVALUATION_ENDPOINT = '/practice/evaluation';
 const FINISH_INTERVIEW_ENDPOINT = '/practice/finish';
+const INTERVIEW_STATUS_COOKIE = '__Secure_1NTMIS';
 
 export interface AgentBuildConfig {
   agent: AgentSettingsObject | string;
@@ -45,6 +47,14 @@ async function request(endpoint: string, params?: object): Promise<unknown> {
 
 function isObject(value: unknown): value is JsonObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+export function syncInterviewStatusCookie(status: number): void {
+  if (typeof status !== 'string' && typeof status !== 'number') return;
+
+  Cookies.set(INTERVIEW_STATUS_COOKIE, String(status), {
+    path: '/'
+  });
 }
 
 function unwrap(value: unknown, keys: string[]): { code: number, status: number, msg: unknown } | null{
@@ -147,6 +157,7 @@ export async function fetchInterview(
   if (!data) throw Error('Invalid response data.');
   if (data.code < 0) throw Error(String(data.msg));
 
+  syncInterviewStatusCookie((data.msg as IInterview).status!);
   return data.msg as IInterview;
 }
 
@@ -173,7 +184,7 @@ export async function uploadTranscript(
 export async function notifyInterviewStarted(
   interviewId: number,
   sessionId: string,
-): Promise<{ interview_id: number, session_id: string, status: string }> {
+): Promise<{ interview_id: number, session_id: string, status: number }> {
   const res = await request(START_INTERVIEW_ENDPOINT, {
     mi_id: interviewId,
     session_id: sessionId,
@@ -183,7 +194,9 @@ export async function notifyInterviewStarted(
   if (!data) throw Error('Invalid response data.');
   if (data.code < 0) throw Error(String(data.msg));
 
-  return data.msg as { interview_id: number, session_id: string, status: string }
+  const ret = data.msg as { interview_id: number, session_id: string, status: number };
+  syncInterviewStatusCookie(ret.status);
+  return ret;
 }
 
 export async function fetchEvaluation(
@@ -203,7 +216,9 @@ export async function fetchEvaluation(
     throw new Error('The evaluation endpoint returned an invalid report.');
   }
 
-  return evaluation as unknown as InterviewEvaluation;
+  const ret = evaluation as unknown as InterviewEvaluation;
+  syncInterviewStatusCookie(ret.status);
+  return ret;
 }
 
 export async function finishInterview(
@@ -224,5 +239,7 @@ export async function finishInterview(
     throw new Error('The finish endpoint returned an invalid interview summary.');
   }
 
-  return result as unknown as FinishedInterview;
+  const ret = result as unknown as FinishedInterview;
+  syncInterviewStatusCookie(ret.status);
+  return ret;
 }
