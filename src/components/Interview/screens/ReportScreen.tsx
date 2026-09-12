@@ -111,16 +111,6 @@ export function ReportScreen({
     },
   ];
 
-  const downloadReport = (): void => {
-    const file = new Blob([JSON.stringify(evaluation, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(file);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `interview-evaluation-${evaluation.interview_id}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
   const scenarioLabel =
     InterviewTypeList.find((item) => item.id === evaluation.scenario)?.text ?? 'Interview';
   const difficultyLabel =
@@ -128,6 +118,71 @@ export function ReportScreen({
     String(evaluation.difficulty);
   const score = Math.max(0, Math.min(100, Number(evaluation.overall_score) || 0));
   const scoreAngle = score * 3.6;
+
+  const downloadReport = (): void => {
+    const formatList = (items: string[]): string =>
+      items.length > 0 ? items.map((item) => `- ${item}`).join('\n') : 'None provided';
+
+    const competencies =
+      evaluation.competencies.length > 0
+        ? evaluation.competencies
+            .map((competency) => `- ${competency.name}: ${competency.score}/100`)
+            .join('\n')
+        : 'None provided';
+    const transcript =
+      evaluation.transcript.length > 0
+        ? evaluation.transcript
+            .map((entry) => {
+              const speaker = entry.speaker === 'you' ? 'You' : 'Interviewer';
+              const timestamp = new Date(entry.capturedAt).toLocaleString();
+              return `[${timestamp}] ${speaker}: ${entry.talk}`;
+            })
+            .join('\n\n')
+        : 'No transcript available';
+    const report = [
+      'INTERVIEW EVALUATION REPORT',
+      '===========================',
+      '',
+      `Interview ID: ${evaluation.interview_id}`,
+      `Scenario: ${scenarioLabel}`,
+      `Difficulty: ${difficultyLabel}`,
+      `Duration: ${formatDuration(evaluation.duration_seconds)}`,
+      `Overall score: ${evaluation.overall_score}/100`,
+      `Generated: ${new Date(evaluation.generated_at).toLocaleString()}`,
+      '',
+      'COMPETENCIES',
+      '------------',
+      competencies,
+      '',
+      'STRENGTHS',
+      '---------',
+      formatList(evaluation.strengths),
+      '',
+      'AREAS TO IMPROVE',
+      '----------------',
+      formatList(evaluation.areas_to_improve),
+      '',
+      'SUGGESTED LEARNING',
+      '------------------',
+      formatList(evaluation.suggested_learning),
+      '',
+      'AI FEEDBACK',
+      '-----------',
+      formatList(evaluation.ai_feedback),
+      '',
+      'INTERVIEW TRANSCRIPT',
+      '--------------------',
+      transcript,
+    ].join('\n');
+
+    const file = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `interview-evaluation-${evaluation.interview_id}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <section className="screen screen--light report-screen">
