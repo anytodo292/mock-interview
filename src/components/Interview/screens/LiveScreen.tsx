@@ -52,9 +52,9 @@ export function LiveScreen({
           />
           <div className="video-frame">
             <SpeakingPortrait interviewer={interviewer} isSpeaking={agentSpeaking && !paused} />
-            <div className="speaking">
+            {/* <div className="speaking">
               <Waveform green /> {agentSpeaking ? 'Speaking' : 'Ready'}
-            </div>
+            </div> */}
           </div>
         </div>
 
