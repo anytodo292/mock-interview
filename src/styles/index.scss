@@ -2142,6 +2142,11 @@ button {
 }
 
 .theme--light {
+  .brand__logo {
+    filter: brightness(0) saturate(100%) invert(32%) sepia(98%) saturate(1161%) hue-rotate(166deg)
+      brightness(91%) contrast(101%);
+  }
+
   .screen--dark {
     color: #11172d;
     background: radial-gradient(circle at 70% 28%, #e9e5ff 0, transparent 35%), #f9faff;
