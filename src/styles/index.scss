@@ -165,11 +165,7 @@ button {
 }
 .screen--light {
   background: #fbfcff;
-  color: #10152f;
-}
-.screen--dark {
-  color: #f7f7ff;
-  background: radial-gradient(circle at 67% 35%, #17203c 0, #081224 36%, #050b18 80%);
+  color: #10152f;  
 }
 .topbar {
   height: 78px;
@@ -1904,6 +1900,9 @@ button {
     color: #eaf7f6;
     background: radial-gradient(circle at 15% 15%, #102a32 0, transparent 28%), #071016;
   }
+  .screen--light h1 {
+    color: #eaf7f6;  
+  }
 
   .topbar {
     border-color: #ffffff0d;
@@ -2147,9 +2146,12 @@ button {
       brightness(91%) contrast(101%);
   }
 
-  .screen--dark {
+  .screen--light {
     color: #11172d;
     background: radial-gradient(circle at 70% 28%, #e9e5ff 0, transparent 35%), #f9faff;
+  }
+  .screen--light h1 {
+    color: #11172d;  
   }
 
   .topbar--dark {
