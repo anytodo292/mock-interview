@@ -25,19 +25,31 @@ export function Avatar({
 export function SpeakingPortrait({
   interviewer,
   isSpeaking,
+  staticImage = false,
 }: {
   interviewer: Interviewer;
   isSpeaking: boolean;
+  staticImage?: boolean;
 }): JSX.Element {
+  const portraitState = staticImage ? 'static' : isSpeaking ? 'speaking' : 'idle';
+
   return (
     <img
-      key={isSpeaking ? 'speaking' : 'idle'}
+      key={portraitState}
       className="portrait-frame portrait-frame--visible"
-      src={isSpeaking ? interviewer.anim_speak : interviewer.anim_listen}
+      src={
+        staticImage
+          ? interviewer.image
+          : isSpeaking
+            ? interviewer.anim_speak
+            : interviewer.anim_listen
+      }
       alt={
-        isSpeaking
-          ? `${interviewer.name} speaking`
-          : `${interviewer.name} waiting for your response`
+        staticImage
+          ? `${interviewer.name}, AI interviewer`
+          : isSpeaking
+            ? `${interviewer.name} speaking`
+            : `${interviewer.name} waiting for your response`
       }
     />
   );

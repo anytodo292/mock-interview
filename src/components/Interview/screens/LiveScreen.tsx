@@ -16,6 +16,7 @@ interface LiveScreenProps {
   userSpeaking: boolean;
   elapsedSeconds: number;
   controlsDisabled?: boolean;
+  runtimeError?: boolean;
   agentMessage?: string;
   onMute: () => void;
   onPause: () => void;
@@ -31,6 +32,7 @@ export function LiveScreen({
   userSpeaking,
   elapsedSeconds,
   controlsDisabled = false,
+  runtimeError = false,
   agentMessage,
   onMute,
   onPause,
@@ -51,7 +53,11 @@ export function LiveScreen({
             elapsedSeconds={elapsedSeconds}
           />
           <div className="video-frame">
-            <SpeakingPortrait interviewer={interviewer} isSpeaking={agentSpeaking && !paused} />
+            <SpeakingPortrait
+              interviewer={interviewer}
+              isSpeaking={agentSpeaking && !paused}
+              staticImage={runtimeError}
+            />
             {/* <div className="speaking">
               <Waveform green /> {agentSpeaking ? 'Speaking' : 'Ready'}
             </div> */}

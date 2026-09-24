@@ -333,6 +333,7 @@ export default function App(): JSX.Element {
         userSpeaking={interview.userSpeaking}
         elapsedSeconds={interview.elapsedSeconds}
         controlsDisabled={interview.status === 'error'}
+        runtimeError={interview.status === 'error'}
         agentMessage={latestAgentMessage}
         onMute={interview.toggleMute}
         onPause={interview.togglePause}
