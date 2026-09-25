@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { InterviewEvaluation } from '../types';
 import { TopBar } from '../shared/TopBar';
+import { useTheme } from '../shared/ThemeContext';
 import { DifficultyTypeList, InterviewTypeList } from '@/constants';
 
 interface ReportScreenProps {
@@ -28,12 +29,14 @@ export function ReportScreen({
   onRetry,
   onAgain,
 }: ReportScreenProps): JSX.Element {
+  const { theme } = useTheme();
+
   const [openSection, setOpenSection] = useState('Strengths');
   const [activeSection, setActiveSection] = useState('summary');
 
   if (loading) {
     return (
-      <section className="screen screen--light report-screen">
+      <section className={`screen screen--${theme} report-screen`}>
         <TopBar />
         <div className="report-state" role="status" aria-live="polite">
           <div className="loading-interview__spinner" aria-hidden="true" />
@@ -47,7 +50,7 @@ export function ReportScreen({
 
   if (error || !evaluation) {
     return (
-      <section className="screen screen--light report-screen">
+      <section className={`screen screen--${theme} report-screen`}>
         <TopBar />
         <div className="report-state" role="alert">
           <div className="blocking-state__icon" aria-hidden="true">
@@ -185,7 +188,7 @@ export function ReportScreen({
   };
 
   return (
-    <section className="screen screen--light report-screen">
+    <section className={`screen screen--${theme} report-screen`}>
       <TopBar />
       <div className="report-heading" id="summary">
         <div>

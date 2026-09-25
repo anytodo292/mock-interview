@@ -1,10 +1,13 @@
 import React from 'react';
 
 import { TopBar } from '../shared/TopBar';
+import { useTheme } from '../shared/ThemeContext';
 
 export function LoadingInterviewScreen(): JSX.Element {
+  const { theme } = useTheme();
+  
   return (
-    <section className="screen screen--light loading-interview-screen">
+    <section className={`screen screen--${theme} loading-interview-screen`}>
       <TopBar />
       <div className="loading-interview" role="status" aria-live="polite">
         <div className="loading-interview__spinner" aria-hidden="true" />

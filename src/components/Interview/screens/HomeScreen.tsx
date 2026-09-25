@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { TopBar } from '../shared/TopBar';
+import { useTheme } from '../shared/ThemeContext';
 import { MockInterviewParams } from '../types';
 import {
   getInterviewerInfo,
@@ -50,6 +51,8 @@ export function HomeScreen({
   interviewInfo,
 }: HomeScreenProps): JSX.Element {
   const scenario = initialParams?.scenario ?? InterviewType.TECH_INTERVIEW;
+  const { theme } = useTheme();
+
   const [selectedInterviewerIdx, setSelectedInterviewerIdx] = useState<number>(
     initialParams?.interviewerIndex ?? 0,
   );
@@ -84,7 +87,7 @@ export function HomeScreen({
   };
 
   return (
-    <section className="screen screen--light home-screen">
+    <section className={`screen screen--${theme} home-screen`}>
       <TopBar />
       <div className="home-grid">
         <div className="home-copy">

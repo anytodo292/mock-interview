@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { TopBar } from '../shared/TopBar';
+import { useTheme } from '../shared/ThemeContext';
 
 interface InstallExtensionScreenProps {
   extensionId: string;
@@ -8,9 +9,11 @@ interface InstallExtensionScreenProps {
 
 export function InstallExtensionScreen({ extensionId }: InstallExtensionScreenProps): JSX.Element {
   const storeUrl = `https://chromewebstore.google.com/detail/ntro/${extensionId}`;
+  
+  const { theme } = useTheme();
 
   return (
-    <section className="screen screen--light results-screen">
+    <section className={`screen screen--${theme} results-screen`}>
       <TopBar />
       <div className="blocking-state">
         <div className="blocking-state__card">

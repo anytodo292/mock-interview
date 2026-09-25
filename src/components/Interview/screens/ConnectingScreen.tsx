@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 
 import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
+import { useTheme } from '../shared/ThemeContext';
 import { Interviewer } from '@/constants';
 
 export function ConnectingScreen({ interviewer }: { interviewer: Interviewer }): JSX.Element {
+  const { theme } = useTheme();
+  
   return (
-    <section className="screen screen--dark connecting-screen">
+    <section className={`screen screen--${theme} connecting-screen`}>
       <TopBar dark />
       <div className="connecting-content">
         <span className="eyebrow eyebrow--dark">Secure session</span>

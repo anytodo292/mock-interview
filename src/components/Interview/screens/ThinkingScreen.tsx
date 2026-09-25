@@ -5,6 +5,7 @@ import { InterviewerIdentity } from '../shared/InterviewVisuals';
 import { Interviewer } from '@/constants';
 import { IInterview } from '@/types';
 import { TopBar } from '../shared/TopBar';
+import { useTheme } from '../shared/ThemeContext';
 
 interface ThinkingScreenProps {
   interviewer: Interviewer;
@@ -29,9 +30,11 @@ export function ThinkingScreen({
   onMute,
   onPause,
 }: ThinkingScreenProps): JSX.Element {
+  const { theme } = useTheme();
+  
   return (
     <section
-      className={`screen screen--dark interview-screen ${paused ? 'interview-screen--paused' : ''}`}
+      className={`screen screen--${theme} interview-screen ${paused ? 'interview-screen--paused' : ''}`}
     >
       <TopBar dark />
       <div className="interview-layout">

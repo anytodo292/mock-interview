@@ -17,7 +17,7 @@ export function TopBar({ dark = false }: { dark?: boolean }): JSX.Element {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className={`topbar ${dark ? 'topbar--dark' : ''}`}>
+    <header className={`topbar topbar--${theme}`}>
       <Logo />
       <button
         type="button"

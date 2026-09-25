@@ -2,6 +2,7 @@ import React from 'react';
 
 import { FinishedInterview } from '../types';
 import { TopBar } from '../shared/TopBar';
+import { useTheme } from '../shared/ThemeContext';
 import { finishInterview } from '@/services/deepgramApi';
 import { DifficultyTypeList, InterviewStatusLabels, InterviewTypeList } from '@/constants';
 
@@ -33,9 +34,11 @@ export function FinishedScreen({
   onAgain,
   completionMessage,
 }: FinishedScreenProps): JSX.Element {
+  const { theme } = useTheme();
+
   if (loading) {
     return (
-      <section className="screen screen--light results-screen">
+      <section className={`screen screen--${theme} results-screen`}>
         <TopBar />
         <div className="report-state" role="status" aria-live="polite">
           <div className="loading-interview__spinner" aria-hidden="true" />
@@ -52,7 +55,7 @@ export function FinishedScreen({
 
   if (error || !result) {
     return (
-      <section className="screen screen--light results-screen">
+      <section className={`screen screen--${theme} results-screen`}>
         <TopBar />
         <div className="report-state" role="alert">
           <div className="blocking-state__icon" aria-hidden="true">
@@ -85,7 +88,7 @@ export function FinishedScreen({
   const scoreAngle = score * 3.6;
 
   return (
-    <section className="screen screen--light results-screen">
+    <section className={`screen screen--${theme} results-screen`}>
       <TopBar />
       <div className="results-layout">
         <div className="result-hero">
@@ -120,10 +123,10 @@ export function FinishedScreen({
             <span className="finished-status">{statusLabel}</span>
           </div>
           <dl className="session-summary">
-            <div>
+            {/* <div>
               <dt>Interview ID</dt>
               <dd>{result.interview_id}</dd>
-            </div>
+            </div> */}
             <div>
               <dt>Difficulty</dt>
               <dd>{difficultyLabel}</dd>

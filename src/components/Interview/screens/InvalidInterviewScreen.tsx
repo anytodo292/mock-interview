@@ -1,10 +1,13 @@
 import React from 'react';
 
 import { TopBar } from '../shared/TopBar';
+import { useTheme } from '../shared/ThemeContext';
 
 export function InvalidInterviewScreen(): JSX.Element {
+  const { theme } = useTheme();
+
   return (
-    <section className="screen screen--light results-screen">
+    <section className={`screen screen--${theme} results-screen`}>
       <TopBar />
       <div className="blocking-state">
         <div className="blocking-state__card">
