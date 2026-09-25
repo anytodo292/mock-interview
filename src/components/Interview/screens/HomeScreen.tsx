@@ -20,6 +20,8 @@ interface HomeScreenProps {
   initialParams?: MockInterviewParams;
   lockInterview?: boolean;
   interviewInfo?: IInterview;
+  deviceCheckError?: string | null;
+  onDismissDeviceCheckError?: () => void;
 }
 
 function CheckIcon(): JSX.Element {
@@ -49,6 +51,8 @@ export function HomeScreen({
   onStart,
   initialParams,
   interviewInfo,
+  deviceCheckError,
+  onDismissDeviceCheckError,
 }: HomeScreenProps): JSX.Element {
   const scenario = initialParams?.scenario ?? InterviewType.TECH_INTERVIEW;
   const { theme } = useTheme();
@@ -74,6 +78,16 @@ export function HomeScreen({
       inline: 'center',
     });
   }, [selectedInterviewerIdx]);
+
+  useEffect(() => {
+    if (!deviceCheckError || !onDismissDeviceCheckError) return;
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') onDismissDeviceCheckError();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [deviceCheckError, onDismissDeviceCheckError]);
 
   const moveInterviewerSelection = (direction: -1 | 1): void => {
     setSelectedInterviewerIdx(
@@ -230,6 +244,34 @@ export function HomeScreen({
           </button>
         </div>
       </div>
+      {deviceCheckError && (
+        <div
+          className="device-alert"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) onDismissDeviceCheckError?.();
+          }}
+        >
+          <div
+            className="device-alert__dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="device-alert-title"
+            aria-describedby="device-alert-message"
+          >
+            <h2 id="device-alert-title">Device check</h2>
+            <p id="device-alert-message">{deviceCheckError}</p>
+            <button
+              type="button"
+              className="primary-button"
+              autoFocus
+              onClick={onDismissDeviceCheckError}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

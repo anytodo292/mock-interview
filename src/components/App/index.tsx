@@ -44,6 +44,7 @@ export default function App(): JSX.Element {
   const hasInterviewQuery = fromExtension && Boolean(interviewId) && Boolean(msId);
 
   const extensionStartedRef = useRef(false);
+  const deviceCheckInProgressRef = useRef(false);
 
   const [screen, setScreen] = useState<Screen>(hasInterviewQuery ? 'loading' : 'invalid');
   const [interviewInfo, setInterviewInfo] = useState<IInterview>();
@@ -57,6 +58,7 @@ export default function App(): JSX.Element {
   const [finishLoading, setFinishLoading] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
   const [completionMessage, setCompletionMessage] = useState<string | null>(null);
+  const [deviceCheckError, setDeviceCheckError] = useState<string | null>(null);
   const [extensionInstalled, setExtensionInstalled] = useState<boolean | null>(
     fromExtension ? null : true,
   );
@@ -207,7 +209,50 @@ export default function App(): JSX.Element {
     setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
   };
 
-  const startInterview = (params: MockInterviewParams): void => {
+  const startInterview = async (params: MockInterviewParams): Promise<void> => {
+    if (deviceCheckInProgressRef.current) return;
+    deviceCheckInProgressRef.current = true;
+    setDeviceCheckError(null);
+
+    let microphoneTestStream: MediaStream | null = null;
+    try {
+      if (!navigator.mediaDevices?.getUserMedia || !navigator.mediaDevices.enumerateDevices) {
+        setDeviceCheckError(
+          'Microphone and sound devices cannot be checked in this browser. Please use a supported browser and try again.',
+        );
+        return;
+      }
+
+      microphoneTestStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const hasMicrophone = microphoneTestStream.getAudioTracks().length > 0;
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const hasSoundOutput = devices.some(({ kind }) => kind === 'audiooutput');
+
+      if (!hasMicrophone || !hasSoundOutput) {
+        const missingDevices = [
+          !hasMicrophone ? 'a microphone' : null,
+          !hasSoundOutput ? 'a sound output device' : null,
+        ].filter(Boolean);
+        setDeviceCheckError(
+          `Please connect ${missingDevices.join(' and ')} before starting the mock interview.`,
+        );
+        return;
+      }
+    } catch (deviceError) {
+      const permissionDenied =
+        deviceError instanceof DOMException &&
+        (deviceError.name === 'NotAllowedError' || deviceError.name === 'SecurityError');
+      setDeviceCheckError(
+        permissionDenied
+          ? 'Microphone access is required. Please allow access and try again.'
+          : 'No working microphone was found. Please connect one and try again.',
+      );
+      return;
+    } finally {
+      microphoneTestStream?.getTracks().forEach((track) => track.stop());
+      deviceCheckInProgressRef.current = false;
+    }
+
     transcriptRef.current = [];
     lastUploadedIndexRef.current = 0;
     setEvaluation(null);
@@ -218,15 +263,15 @@ export default function App(): JSX.Element {
     setSelectedLanguage(params.language);
     setSelectedInterviewerIndex(params.interviewerIndex);
     setScreen('connecting');
-    void interview
-      .start({
+    try {
+      await interview.start({
         ...params,
         ...{ interviewId },
         ...{ msId },
-      })
-      .catch(() => {
-        // The hook exposes a user-facing error and owns resource cleanup.
       });
+    } catch {
+      // The hook exposes a user-facing error and owns resource cleanup.
+    }
   };
 
   const loadFinishedInterview = useCallback(async (): Promise<void> => {
@@ -276,6 +321,7 @@ export default function App(): JSX.Element {
     setFinishedInterview(null);
     setFinishError(null);
     setCompletionMessage(null);
+    setDeviceCheckError(null);
     setScreen('home');
   };
 
@@ -319,6 +365,8 @@ export default function App(): JSX.Element {
         interviewInfo={interviewInfo}
         initialParams={extensionParams ?? undefined}
         lockInterview={fromExtension}
+        deviceCheckError={deviceCheckError}
+        onDismissDeviceCheckError={() => setDeviceCheckError(null)}
       />
     ),
     connecting: <ConnectingScreen interviewer={interviewer} />,

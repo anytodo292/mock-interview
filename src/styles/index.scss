@@ -167,6 +167,9 @@ button {
   background: #fbfcff;
   color: #10152f;  
 }
+.screen--dark {
+  color: #fbfcff;
+}
 .topbar {
   height: 78px;
   padding: 0 34px;
@@ -577,6 +580,44 @@ button {
   accent-color: #6848f3;
 }
 .setup-card > .primary-button {
+  width: 100%;
+}
+
+.device-alert {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: #11152d99;
+  backdrop-filter: blur(3px);
+}
+
+.device-alert__dialog {
+  width: min(430px, 100%);
+  padding: 28px;
+  color: #242a42;
+  background: #fff;
+  border: 1px solid #e4e6ef;
+  border-radius: 18px;
+  box-shadow: 0 24px 70px #11152d4d;
+}
+
+.device-alert__dialog h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.device-alert__dialog p {
+  margin: 0 0 22px;
+  color: #626a80;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.device-alert__dialog .primary-button {
   width: 100%;
 }
 
@@ -1986,6 +2027,21 @@ button {
     background: #0d1920;
     border-color: #22353d;
     box-shadow: 0 28px 80px #0007;
+  }
+
+  .device-alert {
+    background: #02070dcc;
+  }
+
+  .device-alert__dialog {
+    color: #eaf7f6;
+    background: #0d1920;
+    border-color: #22353d;
+    box-shadow: 0 24px 70px #000a;
+  }
+
+  .device-alert__dialog p {
+    color: #92a9ae;
   }
 
   .guidance-steps li {
