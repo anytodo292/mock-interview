@@ -1702,6 +1702,22 @@ button {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.report-item > button b {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  display: grid;
+  place-items: center;
+  color: currentColor;
+}
+.report-item > button b svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
 .report-item:nth-of-type(3) > button i {
   color: #f2a521;
 }
@@ -1758,8 +1774,54 @@ button {
   font-size: 12px;
 }
 
+.competency-breakdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.competency-radar svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.competency-radar__grid polygon,
+.competency-radar__grid line {
+  fill: none;
+  stroke: #dfe3ec;
+  stroke-width: 1;
+}
+
+.competency-radar__score {
+  fill: #6545f540;
+  stroke: #6545f5;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.competency-radar__point {
+  fill: #6545f5;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.competency-radar text {
+  fill: #555d74;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.competency-radar__label-score {
+  fill: #6545f5;
+  font-size: 13px;
+}
+
 .competency-list {
   display: grid;
+  width: 90%;
   gap: 20px;
 }
 
@@ -2167,6 +2229,29 @@ button {
     background: #203039;
   }
 
+  .competency-radar__grid polygon,
+  .competency-radar__grid line {
+    stroke: #294049;
+  }
+
+  .competency-radar__score {
+    fill: #56d5c038;
+    stroke: #56d5c0;
+  }
+
+  .competency-radar__point {
+    fill: #56d5c0;
+    stroke: #0d1920;
+  }
+
+  .competency-radar text {
+    fill: #b7c9cc;
+  }
+
+  .competency-radar__label-score {
+    fill: #62dcc8;
+  }
+
   .competency-row > div:first-child span,
   .report-panel__heading > span,
   .report-state > p,
@@ -2352,6 +2437,15 @@ button {
   }
 }
 @media (max-width: 760px) {
+  .competency-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .competency-radar {
+    width: min(460px, 100%);
+    margin: 0 auto;
+  }
+
   .blocking-state {
     padding: 24px 18px 48px;
   }
