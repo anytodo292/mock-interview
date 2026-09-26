@@ -135,21 +135,7 @@ export default function App(): JSX.Element {
     localStorage.setItem('_ms-id', msId);
 
     if (evaluationRoute) {
-      setScreen('report');
-      setEvaluationLoading(true);
-      setEvaluationError(null);
-      void fetchEvaluation(interviewId)
-        .then(
-          (report) => setEvaluation(report),
-          (evaluationRequestError: unknown) => {
-            setEvaluationError(
-              evaluationRequestError instanceof Error
-                ? evaluationRequestError.message
-                : 'Unable to load the evaluation report.',
-            );
-          },
-        )
-        .finally(() => setEvaluationLoading(false));
+      gotoEvaluation();
       return;
     }
 
@@ -157,6 +143,12 @@ export default function App(): JSX.Element {
       (record: IInterview | null) => {
         if (!record) {
           setScreen('invalid');
+          return;
+        }
+        
+        const arr: number[] = [InterviewStatusType.Finished, InterviewStatusType.Complete, InterviewStatusType.Evaluating];
+        if (record.status && arr.includes(record.status)) {
+          gotoEvaluation();
           return;
         }
         setInterviewInfo(record);
@@ -208,6 +200,24 @@ export default function App(): JSX.Element {
   const toggleTheme = (): void => {
     setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
   };
+
+  const gotoEvaluation = ():void => {
+    setScreen('report');
+    setEvaluationLoading(true);
+    setEvaluationError(null);
+    void fetchEvaluation(interviewId)
+      .then(
+        (report) => setEvaluation(report),
+        (evaluationRequestError: unknown) => {
+          setEvaluationError(
+            evaluationRequestError instanceof Error
+              ? evaluationRequestError.message
+              : 'Unable to load the evaluation report.',
+          );
+        },
+      )
+      .finally(() => setEvaluationLoading(false));
+  }
 
   const startInterview = async (params: MockInterviewParams): Promise<void> => {
     if (deviceCheckInProgressRef.current) return;
