@@ -38,8 +38,8 @@ import { IInterview } from '@/types';
 export default function App(): JSX.Element {
   const search = useMemo(() => new URLSearchParams(window.location.search), []);
   const fromExtension = search.get('from') === 'extension';
-  const interviewId = Number(search.get('mi_id'));
-  const msId = search.get('ms_id') ?? '';
+  const interviewId = Number(search.get('hkmid'));
+  const msId = search.get('hksid') ?? '';
   const evaluationRoute = search.get('route')?.toLowerCase() === 'evaluation';
   const hasInterviewQuery = fromExtension && Boolean(interviewId) && Boolean(msId);
 
@@ -146,11 +146,11 @@ export default function App(): JSX.Element {
           return;
         }
         
-        const arr: number[] = [InterviewStatusType.Finished, InterviewStatusType.Complete, InterviewStatusType.Evaluating];
-        if (record.status && arr.includes(record.status)) {
-          gotoEvaluation();
-          return;
-        }
+        // const arr: number[] = [InterviewStatusType.Finished, InterviewStatusType.Complete, InterviewStatusType.Evaluating];
+        // if (record.status && arr.includes(record.status)) {
+        //   gotoEvaluation();
+        //   return;
+        // }
         setInterviewInfo(record);
         setExtensionParams({
           language: record.lang,
@@ -159,8 +159,8 @@ export default function App(): JSX.Element {
           interviewerIndex: 0,
         });
         setSelectedLanguage(record.lang);
-        if (record.status === InterviewStatusType.Active) 
-          syncInterviewStatusCookie(InterviewStatusType.Ready);
+        // if (record.status === InterviewStatusType.Active) 
+        syncInterviewStatusCookie(InterviewStatusType.Ready);
 
         setScreen('home');
       },
@@ -333,6 +333,7 @@ export default function App(): JSX.Element {
     setCompletionMessage(null);
     setDeviceCheckError(null);
     setScreen('home');
+    syncInterviewStatusCookie(InterviewStatusType.Ready);
   };
 
   const loadEvaluation = useCallback(async (): Promise<void> => {
