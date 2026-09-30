@@ -18,6 +18,9 @@ import { startAgentMicrophoneWithDevice } from '../utils/microphone';
 export type InterviewStatus =
   'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'ended' | 'error';
 
+const AGENT_AUDIO_BUFFER_MS = 300;
+const LINEAR16_BYTES_PER_SAMPLE = 2;
+
 interface InterviewCallbacks {
   onReady: () => void;
   onThinking: () => void;
@@ -186,6 +189,39 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         playerRef.current = player;
         microphoneRef.current = microphone;
 
+        let bufferedAudioChunks: ArrayBuffer[] = [];
+        let bufferedAudioBytes = 0;
+        let bufferingAudio = true;
+
+        const clearBufferedAudio = (): void => {
+          bufferedAudioChunks = [];
+          bufferedAudioBytes = 0;
+          bufferingAudio = true;
+        };
+
+        const flushBufferedAudio = (rebufferAfterFlush = false): void => {
+          bufferedAudioChunks.forEach((chunk) => player.queue(chunk));
+          bufferedAudioChunks = [];
+          bufferedAudioBytes = 0;
+          bufferingAudio = rebufferAfterFlush;
+        };
+
+        const queueAgentAudio = (chunk: ArrayBuffer): void => {
+          if (!bufferingAudio) {
+            player.queue(chunk);
+            return;
+          }
+
+          bufferedAudioChunks.push(chunk);
+          bufferedAudioBytes += chunk.byteLength;
+          const bufferedDurationMs =
+            (bufferedAudioBytes / (outputSampleRate * LINEAR16_BYTES_PER_SAMPLE)) * 1_000;
+
+          if (bufferedDurationMs >= AGENT_AUDIO_BUFFER_MS) {
+            flushBufferedAudio();
+          }
+        };
+
         const notifyStart = (): void => {
           if (!isCurrentAttempt()) return;
           if (startNotificationSentRef.current || !interviewId) return;
@@ -234,6 +270,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
             playbackMonitorRef.current = null;
             setAgentSpeaking(false);
+            if (!mutedRef.current && !pausedRef.current) microphone.unmute();
             if (!pausedRef.current) setStatus('listening');
           };
 
@@ -242,7 +279,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
         session.on('audio', (chunk) => {
           if (!isCurrentAttempt()) return;
-          player.queue(chunk);
+          queueAgentAudio(chunk);
           stopPlaybackMonitor();
           setAgentSpeaking(true);
           setUserSpeaking(false);
@@ -295,6 +332,10 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('user-started-speaking', () => {
           if (!isCurrentAttempt()) return;
+          // Playback echo can be reported as user speech and would otherwise
+          // destroy all audio already scheduled by AgentPlayer.
+          if (bufferedAudioBytes > 0 || player.getRemainingPlaybackTime() > 0.05) return;
+          clearBufferedAudio();
           player.interrupt();
           stopPlaybackMonitor();
           setAgentSpeaking(false);
@@ -312,6 +353,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('agent-started-speaking', () => {
           if (!isCurrentAttempt()) return;
+          // Prevent speaker output from reaching server-side VAD. This trades
+          // barge-in for uninterrupted agent playback on echo-prone devices.
+          microphone.mute();
           setUserSpeaking(false);
           if (pausedRef.current) return;
           setAgentSpeaking(true);
@@ -319,7 +363,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           callbacksRef.current.onAgentSpeaking();
         });
         session.on('agent-audio-done', () => {
-          if (isCurrentAttempt()) waitForPlaybackToFinish();
+          if (!isCurrentAttempt()) return;
+          flushBufferedAudio(true);
+          waitForPlaybackToFinish();
         });
         session.on('reconnecting', () => {
           if (isCurrentAttempt()) setStatus('connecting');
