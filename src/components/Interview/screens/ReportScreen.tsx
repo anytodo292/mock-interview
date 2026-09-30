@@ -4,8 +4,10 @@ import { EvaluationCompetency, InterviewEvaluation } from '../types';
 import { TopBar } from '../shared/TopBar';
 import { useTheme } from '../shared/ThemeContext';
 import { DifficultyTypeList, InterviewTypeList } from '@/constants';
+import { IInterview } from '@/types';
 
 interface ReportScreenProps {
+  interview?: IInterview;
   evaluation: InterviewEvaluation | null;
   loading: boolean;
   error: string | null;
@@ -95,6 +97,7 @@ function CompetencyRadar({ competencies }: { competencies: EvaluationCompetency[
 }
 
 export function ReportScreen({
+  interview,
   evaluation,
   loading,
   error,
@@ -191,6 +194,11 @@ export function ReportScreen({
   const difficultyLabel =
     DifficultyTypeList.find((item) => item.id === Number(evaluation.difficulty))?.text ??
     String(evaluation.difficulty);
+  
+  const infoList = [];
+  if (interview?.company) infoList.push(interview?.company);
+  if (interview?.position) infoList.push(interview?.position);
+
   const score = Math.max(0, Math.min(100, Number(evaluation.overall_score) || 0));
   const scoreAngle = score * 3.6;
 
@@ -266,8 +274,9 @@ export function ReportScreen({
         <div>
           <span className="eyebrow">Interview complete</span>
           <h1>Your detailed interview report</h1>
+          {infoList.length > 0&& <p style={{ marginBottom: 5 }}>{infoList.join(' · ')}</p>}
           <p>
-            {scenarioLabel} &middot; {difficultyLabel} &middot;{' '}
+            {scenarioLabel}{' · '}{difficultyLabel}{' · '}
             {formatDuration(evaluation.duration_seconds)}
           </p>
         </div>

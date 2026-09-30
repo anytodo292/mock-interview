@@ -3,10 +3,11 @@ import React from 'react';
 import { FinishedInterview } from '../types';
 import { TopBar } from '../shared/TopBar';
 import { useTheme } from '../shared/ThemeContext';
-import { finishInterview } from '@/services/deepgramApi';
 import { DifficultyTypeList, InterviewStatusLabels, InterviewTypeList } from '@/constants';
+import { IInterview } from '@/types';
 
 interface FinishedScreenProps {
+  interview?: IInterview;
   result: FinishedInterview | null;
   loading: boolean;
   error: string | null;
@@ -26,6 +27,7 @@ function formatDuration(totalSeconds: number): string {
 }
 
 export function FinishedScreen({
+  interview,
   result,
   loading,
   error,
@@ -77,6 +79,10 @@ export function FinishedScreen({
     );
   }
 
+  const infoList = [];
+  if (interview?.company) infoList.push(interview?.company);
+  if (interview?.position) infoList.push(interview?.position);
+
   const scenarioLabel =
     InterviewTypeList.find((item) => item.id === result.scenario)?.text ?? 'Interview';
   const difficultyLabel =
@@ -122,11 +128,13 @@ export function FinishedScreen({
             </div>
             <span className="finished-status">{statusLabel}</span>
           </div>
+          {infoList.length > 0&& <p style={{ marginBottom: 5 }}>{infoList.join(' · ')}</p>}
           <dl className="session-summary">
             {/* <div>
               <dt>Interview ID</dt>
               <dd>{result.interview_id}</dd>
             </div> */}
+            
             <div>
               <dt>Difficulty</dt>
               <dd>{difficultyLabel}</dd>

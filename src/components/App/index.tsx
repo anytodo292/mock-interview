@@ -136,6 +136,11 @@ export default function App(): JSX.Element {
     localStorage.setItem('_ms-id', msId);
 
     if (evaluationRoute) {
+      fetchInterview(interviewId).then(record => {
+        if (record) {
+          setInterviewInfo(record);
+        }
+      });
       gotoEvaluation();
       return;
     }
@@ -417,6 +422,7 @@ export default function App(): JSX.Element {
     ),
     finished: (
       <FinishedScreen
+        interview={interviewInfo}
         result={finishedInterview}
         loading={finishLoading}
         error={finishError}
@@ -428,6 +434,7 @@ export default function App(): JSX.Element {
     ),
     report: (
       <ReportScreen
+        interview={interviewInfo}
         evaluation={evaluation}
         loading={evaluationLoading}
         error={evaluationError}
