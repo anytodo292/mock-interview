@@ -18,8 +18,29 @@ import { startAgentMicrophoneWithDevice } from '../utils/microphone';
 export type InterviewStatus =
   'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'ended' | 'error';
 
-const AGENT_AUDIO_BUFFER_MS = 300;
+const PLAYER_WARMUP_SILENCE_MS = 200;
 const LINEAR16_BYTES_PER_SAMPLE = 2;
+const OPTIMIZED_OUTPUT_SAMPLE_RATE = 16_000;
+const INITIAL_AUDIO_BUFFER_MS = 800;
+const REBUFFER_AUDIO_MS = 500;
+const PLAYBACK_EMPTY_SECONDS = 0.005;
+
+function decodeMuLaw(chunk: ArrayBuffer): ArrayBuffer {
+  const encoded = new Uint8Array(chunk);
+  const decoded = new Int16Array(encoded.length);
+
+  for (let index = 0; index < encoded.length; index += 1) {
+    const value = ~encoded[index] & 0xff;
+    const sign = value & 0x80;
+    const exponent = (value >> 4) & 0x07;
+    const mantissa = value & 0x0f;
+    let sample = ((mantissa << 3) + 0x84) << exponent;
+    sample -= 0x84;
+    decoded[index] = sign ? -sample : sample;
+  }
+
+  return decoded.buffer;
+}
 
 interface InterviewCallbacks {
   onReady: () => void;
@@ -167,13 +188,21 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         const agentBuild = await fetchAgentBuild(params, interviewId);
         if (!isCurrentAttempt()) return;
         const inputSampleRate = agentBuild.audio?.input?.sampleRate ?? 16_000;
-        const outputSampleRate = agentBuild.audio?.output?.sampleRate ?? 24_000;
+        const outputSampleRate = OPTIMIZED_OUTPUT_SAMPLE_RATE;
+        const optimizedAudio = {
+          ...agentBuild.audio,
+          output: {
+            ...agentBuild.audio?.output,
+            encoding: 'mulaw' as const,
+            sampleRate: outputSampleRate,
+          },
+        };
         const session = new AgentSession({
           auth: {
             tokenFactory: extensionToken ? async () => extensionToken : fetchDeepgramToken,
           },
           agent: agentBuild.agent,
-          audio: agentBuild.audio,
+          audio: optimizedAudio,
           tags: agentBuild.tags ?? ['mock-interview'],
           experimental: agentBuild.experimental,
         });
@@ -191,22 +220,38 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
         let bufferedAudioChunks: ArrayBuffer[] = [];
         let bufferedAudioBytes = 0;
+        let playerNeedsWarmup = true;
         let bufferingAudio = true;
+        let playbackStarted = false;
+        let targetBufferMs = INITIAL_AUDIO_BUFFER_MS;
 
-        const clearBufferedAudio = (): void => {
-          bufferedAudioChunks = [];
-          bufferedAudioBytes = 0;
-          bufferingAudio = true;
-        };
+        const flushBufferedAudio = (): void => {
+          if (bufferedAudioChunks.length === 0) return;
 
-        const flushBufferedAudio = (rebufferAfterFlush = false): void => {
+          if (playerNeedsWarmup && bufferedAudioChunks.length > 0) {
+            const warmupSampleCount = Math.ceil(
+              (outputSampleRate * PLAYER_WARMUP_SILENCE_MS) / 1_000,
+            );
+            player.queue(new ArrayBuffer(warmupSampleCount * LINEAR16_BYTES_PER_SAMPLE));
+            playerNeedsWarmup = false;
+          }
           bufferedAudioChunks.forEach((chunk) => player.queue(chunk));
           bufferedAudioChunks = [];
           bufferedAudioBytes = 0;
-          bufferingAudio = rebufferAfterFlush;
+          bufferingAudio = false;
+          playbackStarted = true;
         };
 
         const queueAgentAudio = (chunk: ArrayBuffer): void => {
+          if (
+            !bufferingAudio &&
+            playbackStarted &&
+            player.getRemainingPlaybackTime() <= PLAYBACK_EMPTY_SECONDS
+          ) {
+            bufferingAudio = true;
+            targetBufferMs = REBUFFER_AUDIO_MS;
+          }
+
           if (!bufferingAudio) {
             player.queue(chunk);
             return;
@@ -217,7 +262,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           const bufferedDurationMs =
             (bufferedAudioBytes / (outputSampleRate * LINEAR16_BYTES_PER_SAMPLE)) * 1_000;
 
-          if (bufferedDurationMs >= AGENT_AUDIO_BUFFER_MS) {
+          if (bufferedDurationMs >= targetBufferMs) {
             flushBufferedAudio();
           }
         };
@@ -279,7 +324,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
         session.on('audio', (chunk) => {
           if (!isCurrentAttempt()) return;
-          queueAgentAudio(chunk);
+          // Some SDK/server versions deliver audio before AgentStartedSpeaking.
+          microphone.mute();
+          queueAgentAudio(decodeMuLaw(chunk));
           stopPlaybackMonitor();
           setAgentSpeaking(true);
           setUserSpeaking(false);
@@ -335,8 +382,8 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           // Playback echo can be reported as user speech and would otherwise
           // destroy all audio already scheduled by AgentPlayer.
           if (bufferedAudioBytes > 0 || player.getRemainingPlaybackTime() > 0.05) return;
-          clearBufferedAudio();
-          player.interrupt();
+          // Do not interrupt an idle player. AgentPlayer.interrupt() closes its
+          // AudioContext, which makes the beginning of the next response unreliable.
           stopPlaybackMonitor();
           setAgentSpeaking(false);
           setUserSpeaking(true);
@@ -364,7 +411,10 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('agent-audio-done', () => {
           if (!isCurrentAttempt()) return;
-          flushBufferedAudio(true);
+          flushBufferedAudio();
+          bufferingAudio = true;
+          playbackStarted = false;
+          targetBufferMs = INITIAL_AUDIO_BUFFER_MS;
           waitForPlaybackToFinish();
         });
         session.on('reconnecting', () => {
