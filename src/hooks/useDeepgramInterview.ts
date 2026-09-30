@@ -13,6 +13,7 @@ import {
   notifyInterviewStarted,
 } from '../services/deepgramApi';
 import { InterviewStartParams, InterviewTranscript } from '../components/Interview/types';
+import { startAgentMicrophoneWithDevice } from '../utils/microphone';
 
 export type InterviewStatus =
   'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'ended' | 'error';
@@ -129,7 +130,12 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   }, [releaseResources]);
 
   const start = useCallback(
-    async ({ msId, interviewId, ...params }: InterviewStartParams): Promise<void> => {
+    async ({
+      msId,
+      interviewId,
+      microphoneDeviceId,
+      ...params
+    }: InterviewStartParams): Promise<void> => {
       // This is the application's correlation ID for the complete interview lifecycle.
       // Deepgram's Welcome message does not always expose a session ID.
       const clientSessionId = crypto.randomUUID();
@@ -337,7 +343,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           player.dispose();
           return;
         }
-        await microphone.start();
+        await startAgentMicrophoneWithDevice(microphone, microphoneDeviceId);
       } catch (startError) {
         if (!isCurrentAttempt()) return;
         intentionalEndRef.current = true;

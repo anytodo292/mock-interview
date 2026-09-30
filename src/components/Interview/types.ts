@@ -21,6 +21,7 @@ export interface MockInterviewParams {
 export interface InterviewStartParams extends MockInterviewParams {
   msId: string;
   interviewId: number;
+  microphoneDeviceId: string;
 }
 
 export interface InterviewTranscript {

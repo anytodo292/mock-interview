@@ -34,6 +34,7 @@ import {
   uploadTranscript,
 } from '../../services/deepgramApi';
 import { IInterview } from '@/types';
+import { getDefaultMicrophoneDeviceId, getMicrophoneStream } from '../../utils/microphone';
 
 export default function App(): JSX.Element {
   const search = useMemo(() => new URLSearchParams(window.location.search), []);
@@ -225,6 +226,7 @@ export default function App(): JSX.Element {
     setDeviceCheckError(null);
 
     let microphoneTestStream: MediaStream | null = null;
+    let microphoneDeviceId: string | null = null;
     try {
       if (!navigator.mediaDevices?.getUserMedia || !navigator.mediaDevices.enumerateDevices) {
         setDeviceCheckError(
@@ -233,7 +235,8 @@ export default function App(): JSX.Element {
         return;
       }
 
-      microphoneTestStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      microphoneDeviceId = await getDefaultMicrophoneDeviceId();
+      microphoneTestStream = await getMicrophoneStream(microphoneDeviceId);
       const hasMicrophone = microphoneTestStream.getAudioTracks().length > 0;
       const devices = await navigator.mediaDevices.enumerateDevices();
       const hasSoundOutput = devices.some(({ kind }) => kind === 'audiooutput');
@@ -278,6 +281,7 @@ export default function App(): JSX.Element {
         ...params,
         ...{ interviewId },
         ...{ msId },
+        microphoneDeviceId: microphoneDeviceId!,
       });
     } catch {
       // The hook exposes a user-facing error and owns resource cleanup.
