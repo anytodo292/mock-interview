@@ -18,12 +18,14 @@ import { startAgentMicrophoneWithDevice } from '../utils/microphone';
 export type InterviewStatus =
   'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'ended' | 'error';
 
-const PLAYER_WARMUP_SILENCE_MS = 200;
-const LINEAR16_BYTES_PER_SAMPLE = 2;
+// pre-buffering-anthony
+// const PLAYER_WARMUP_SILENCE_MS = 200;
+// const LINEAR16_BYTES_PER_SAMPLE = 2;
 const OPTIMIZED_OUTPUT_SAMPLE_RATE = 16_000;
-const INITIAL_AUDIO_BUFFER_MS = 800;
-const REBUFFER_AUDIO_MS = 500;
-const PLAYBACK_EMPTY_SECONDS = 0.005;
+// pre-buffering-anthony
+// const INITIAL_AUDIO_BUFFER_MS = 800;
+// const REBUFFER_AUDIO_MS = 500;
+// const PLAYBACK_EMPTY_SECONDS = 0.005;
 
 function decodeMuLaw(chunk: ArrayBuffer): ArrayBuffer {
   const encoded = new Uint8Array(chunk);
@@ -217,7 +219,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         sessionRef.current = session;
         playerRef.current = player;
         microphoneRef.current = microphone;
-
+        /* pre-buffering-anthony
         let bufferedAudioChunks: ArrayBuffer[] = [];
         let bufferedAudioBytes = 0;
         let playerNeedsWarmup = true;
@@ -266,7 +268,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
             flushBufferedAudio();
           }
         };
-
+        */
         const notifyStart = (): void => {
           if (!isCurrentAttempt()) return;
           if (startNotificationSentRef.current || !interviewId) return;
@@ -315,7 +317,8 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
             playbackMonitorRef.current = null;
             setAgentSpeaking(false);
-            if (!mutedRef.current && !pausedRef.current) microphone.unmute();
+            // pre-buffering-anthony
+            // if (!mutedRef.current && !pausedRef.current) microphone.unmute();
             if (!pausedRef.current) setStatus('listening');
           };
 
@@ -324,9 +327,14 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
         session.on('audio', (chunk) => {
           if (!isCurrentAttempt()) return;
+          player.queue(decodeMuLaw(chunk));
+
+          // pre-buffering-anthony
           // Some SDK/server versions deliver audio before AgentStartedSpeaking.
-          microphone.mute();
-          queueAgentAudio(decodeMuLaw(chunk));
+          // microphone.mute();
+          // queueAgentAudio(decodeMuLaw(chunk));
+          // pre-buffering-anthony
+
           stopPlaybackMonitor();
           setAgentSpeaking(true);
           setUserSpeaking(false);
@@ -379,11 +387,10 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('user-started-speaking', () => {
           if (!isCurrentAttempt()) return;
-          // Playback echo can be reported as user speech and would otherwise
-          // destroy all audio already scheduled by AgentPlayer.
-          if (bufferedAudioBytes > 0 || player.getRemainingPlaybackTime() > 0.05) return;
-          // Do not interrupt an idle player. AgentPlayer.interrupt() closes its
-          // AudioContext, which makes the beginning of the next response unreliable.
+          player.interrupt(); 
+          // pre-buffering-anthony
+          // if (bufferedAudioBytes > 0 || player.getRemainingPlaybackTime() > 0.05) return;
+          // pre-buffering-anthony
           stopPlaybackMonitor();
           setAgentSpeaking(false);
           setUserSpeaking(true);
@@ -400,9 +407,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('agent-started-speaking', () => {
           if (!isCurrentAttempt()) return;
-          // Prevent speaker output from reaching server-side VAD. This trades
-          // barge-in for uninterrupted agent playback on echo-prone devices.
-          microphone.mute();
+          // pre-buffering-anthony
+          // microphone.mute();
+          // pre-buffering-anthony
           setUserSpeaking(false);
           if (pausedRef.current) return;
           setAgentSpeaking(true);
@@ -410,12 +417,16 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           callbacksRef.current.onAgentSpeaking();
         });
         session.on('agent-audio-done', () => {
-          if (!isCurrentAttempt()) return;
-          flushBufferedAudio();
-          bufferingAudio = true;
-          playbackStarted = false;
-          targetBufferMs = INITIAL_AUDIO_BUFFER_MS;
-          waitForPlaybackToFinish();
+          if (isCurrentAttempt()) waitForPlaybackToFinish();
+
+          // pre-buffering-anthony
+          // if (!isCurrentAttempt()) return;
+          // flushBufferedAudio();
+          // bufferingAudio = true;
+          // playbackStarted = false;
+          // targetBufferMs = INITIAL_AUDIO_BUFFER_MS;
+          // waitForPlaybackToFinish();
+          // pre-buffering-anthony
         });
         session.on('reconnecting', () => {
           if (isCurrentAttempt()) setStatus('connecting');
