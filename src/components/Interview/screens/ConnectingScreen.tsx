@@ -5,9 +5,21 @@ import { TopBar } from '../shared/TopBar';
 import { useTheme } from '../shared/ThemeContext';
 import { Interviewer } from '@/constants';
 
-export function ConnectingScreen({ interviewer }: { interviewer: Interviewer }): JSX.Element {
+interface ConnectingScreenProps {
+  interviewer: Interviewer;
+  retryCount: number;
+  maxRetries: number;
+}
+
+export function ConnectingScreen({
+  interviewer,
+  retryCount,
+  maxRetries,
+}: ConnectingScreenProps): JSX.Element {
   const { theme } = useTheme();
-  
+
+  const retrying = retryCount > 0;
+
   return (
     <section className={`screen screen--${theme} connecting-screen`}>
       <TopBar dark />
@@ -16,7 +28,11 @@ export function ConnectingScreen({ interviewer }: { interviewer: Interviewer }):
         <h1>
           Connecting<span className="animated-dots">...</span>
         </h1>
-        <p>Please wait while we connect you to your AI interviewer.</p>
+        <p>
+          {retrying
+            ? `The connection timed out. Retrying ${retryCount} of ${maxRetries}...`
+            : 'Please wait while we connect you to your AI interviewer.'}
+        </p>
         <div className="connection-orbit">
           <Waveform />
           <Avatar interviewer={interviewer} />

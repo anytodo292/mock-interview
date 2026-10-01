@@ -22,6 +22,7 @@ export type InterviewStatus =
 // const PLAYER_WARMUP_SILENCE_MS = 200;
 // const LINEAR16_BYTES_PER_SAMPLE = 2;
 const OPTIMIZED_OUTPUT_SAMPLE_RATE = 16_000;
+const MAX_CONNECTION_RETRIES = 2;
 // pre-buffering-anthony
 // const INITIAL_AUDIO_BUFFER_MS = 800;
 // const REBUFFER_AUDIO_MS = 500;
@@ -60,6 +61,8 @@ interface DeepgramInterview {
   sessionId: string | null;
   error: string | null;
   transcriptList: InterviewTranscript[];
+  connectionRetryCount: number;
+  maxConnectionRetries: number;
   start: (params: InterviewStartParams) => Promise<void>;
   end: () => void;
   reset: () => void;
@@ -84,6 +87,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [transcriptList, setTranscriptList] = useState<InterviewTranscript[]>([]);
+  const [connectionRetryCount, setConnectionRetryCount] = useState(0);
 
   const sessionRef = useRef<AgentSession | null>(null);
   const microphoneRef = useRef<AgentMicrophone | null>(null);
@@ -133,6 +137,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setAgentSpeaking(false);
     setUserSpeaking(false);
     setElapsedSeconds(0);
+    setConnectionRetryCount(0);
     mutedRef.current = false;
     pausedRef.current = false;
     setStatus('ended');
@@ -149,6 +154,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setAgentSpeaking(false);
     setUserSpeaking(false);
     setElapsedSeconds(0);
+    setConnectionRetryCount(0);
     setSessionId(null);
     setError(null);
     setTranscriptList([]);
@@ -177,6 +183,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       setAgentSpeaking(false);
       setUserSpeaking(false);
       setElapsedSeconds(0);
+      setConnectionRetryCount(0);
       setSessionId(clientSessionId);
       mutedRef.current = false;
       pausedRef.current = false;
@@ -199,6 +206,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
             sampleRate: outputSampleRate,
           },
         };
+
         const session = new AgentSession({
           auth: {
             tokenFactory: extensionToken ? async () => extensionToken : fetchDeepgramToken,
@@ -207,6 +215,10 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           audio: optimizedAudio,
           tags: agentBuild.tags ?? ['mock-interview'],
           experimental: agentBuild.experimental,
+          reconnect: {
+            enabled: true,
+            maxAttempts: MAX_CONNECTION_RETRIES,
+          },
         });
         const player = new AgentPlayer({ sampleRate: outputSampleRate });
         const microphone = new AgentMicrophone((audio) => session.sendAudio(audio), {
@@ -214,6 +226,13 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
+        });
+        let connectionEstablished = false;
+        let resolveInitialConnection: () => void = () => undefined;
+        let rejectInitialConnection: (reason: Error) => void = () => undefined;
+        const initialConnectionReady = new Promise<void>((resolve, reject) => {
+          resolveInitialConnection = resolve;
+          rejectInitialConnection = reject;
         });
 
         sessionRef.current = session;
@@ -286,6 +305,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
         const handleRuntimeError = (runtimeError: unknown): void => {
           if (!isCurrentAttempt()) return;
+          // Initial connection failures are managed by AgentSession's typed
+          // reconnecting/disconnected lifecycle below.
+          if (!connectionEstablished) return;
           connectionAttemptRef.current += 1;
           intentionalEndRef.current = true;
           releaseResources();
@@ -387,7 +409,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('user-started-speaking', () => {
           if (!isCurrentAttempt()) return;
-          player.interrupt(); 
+          player.interrupt();
           // pre-buffering-anthony
           // if (bufferedAudioBytes > 0 || player.getRemainingPlaybackTime() > 0.05) return;
           // pre-buffering-anthony
@@ -428,10 +450,20 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           // waitForPlaybackToFinish();
           // pre-buffering-anthony
         });
-        session.on('reconnecting', () => {
-          if (isCurrentAttempt()) setStatus('connecting');
+        session.on('connected', () => {
+          if (!isCurrentAttempt()) return;
+          connectionEstablished = true;
+          resolveInitialConnection();
+        });
+        session.on('reconnecting', (attempt) => {
+          if (!isCurrentAttempt()) return;
+          if (!connectionEstablished) setConnectionRetryCount(attempt);
+          setStatus('connecting');
         });
         session.on('disconnected', (reason) => {
+          if (!connectionEstablished) {
+            rejectInitialConnection(new Error(reason || 'Unable to connect to Deepgram.'));
+          }
           if (!isCurrentAttempt()) return;
           if (intentionalEndRef.current) return;
           setUserSpeaking(false);
@@ -445,6 +477,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         microphone.on('error', handleRuntimeError);
 
         await session.connect();
+        await initialConnectionReady;
         if (!isCurrentAttempt()) {
           session.disconnect();
           player.dispose();
@@ -521,6 +554,8 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     sessionId,
     error,
     transcriptList,
+    connectionRetryCount,
+    maxConnectionRetries: MAX_CONNECTION_RETRIES,
     start,
     end,
     reset,

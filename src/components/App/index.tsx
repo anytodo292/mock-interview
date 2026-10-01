@@ -151,7 +151,7 @@ export default function App(): JSX.Element {
           setScreen('invalid');
           return;
         }
-        
+
         // const arr: number[] = [InterviewStatusType.Finished, InterviewStatusType.Complete, InterviewStatusType.Evaluating];
         // if (record.status && arr.includes(record.status)) {
         //   gotoEvaluation();
@@ -389,7 +389,13 @@ export default function App(): JSX.Element {
         onDismissDeviceCheckError={() => setDeviceCheckError(null)}
       />
     ),
-    connecting: <ConnectingScreen interviewer={interviewer} />,
+    connecting: (
+      <ConnectingScreen
+        interviewer={interviewer}
+        retryCount={interview.connectionRetryCount}
+        maxRetries={interview.maxConnectionRetries}
+      />
+    ),
     live: (
       <LiveScreen
         interviewer={interviewer}
