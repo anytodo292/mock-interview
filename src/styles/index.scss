@@ -864,6 +864,28 @@ button {
   font-size: 17px;
   line-height: 1.55;
 }
+.question-message__toggle {
+  display: block;
+  margin: -16px 0 10px auto;
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: #a9b1c4;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.question-message__toggle:hover {
+  color: #fff;
+}
+.question-message__toggle:focus-visible {
+  outline: 2px solid #8d75f5;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.question-message .question {
+  margin: 0;
+}
 .listening-card {
   padding: 18px 21px;
   background: #10192d;
@@ -2292,6 +2314,7 @@ button {
     color: #11172d;
     background: radial-gradient(circle at 70% 28%, #e9e5ff 0, transparent 35%), #f9faff;
   }
+
   
   h1, h2 {
     color: #11172d;  
@@ -2319,6 +2342,14 @@ button {
     background: #fff;
     border-color: #dfe3ec;
     box-shadow: 0 12px 32px #222a5012;
+  }
+
+  .question-message__toggle {
+    color: #687189;
+  }
+
+  .question-message__toggle:hover {
+    color: #11172d;
   }
 
   .secure-note small {

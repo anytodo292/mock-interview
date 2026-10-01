@@ -38,9 +38,10 @@ export function LiveScreen({
   onMute,
   onPause,
 }: LiveScreenProps): JSX.Element {
+  const [messageVisible, setMessageVisible] = React.useState(true);
   const someoneSpeaking = agentSpeaking || userSpeaking;
   const activityInactive = paused || (muted && !agentSpeaking);
-  
+
   const { theme } = useTheme();
 
   return (
@@ -73,10 +74,23 @@ export function LiveScreen({
               <i /> Live interview
             </span>
             <h1>Let&apos;s talk about your experience.</h1>
-            <p className="question">
-              {agentMessage ??
-                `${interviewer.name} is ready. Say hello to begin your mock interview.`}
-            </p>
+            <div className="question-message">
+              <button
+                type="button"
+                className="question-message__toggle"
+                aria-controls="interviewer-message"
+                aria-expanded={messageVisible}
+                onClick={() => setMessageVisible((visible) => !visible)}
+              >
+                {messageVisible ? 'Hide message' : 'Show message'}
+              </button>
+              {messageVisible && (
+                <p className="question" id="interviewer-message">
+                  {agentMessage ??
+                    `${interviewer.name} is ready. Say hello to begin your mock interview.`}
+                </p>
+              )}
+            </div>
           </div>
 
           <div
