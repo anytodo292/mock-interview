@@ -1935,11 +1935,11 @@ button {
   border-radius: 14px 4px 14px 14px;
 }
 
-.transcript-turn > div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
+.transcript-turn__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 16px;
 }
 
 .transcript-turn strong {
@@ -1949,13 +1949,18 @@ button {
 .transcript-turn time {
   color: #858ba0;
   font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
 }
 
 .transcript-turn p {
-  margin: 7px 0 0;
+  min-width: 0;
+  margin: 0;
   color: #4b5269;
   font-size: 13px;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .report-empty {

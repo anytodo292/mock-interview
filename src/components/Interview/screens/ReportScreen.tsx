@@ -408,8 +408,8 @@ export function ReportScreen({
                     className={`transcript-turn transcript-turn--${entry.speaker}`}
                     key={entry.id ?? `${entry.capturedAt}-${index}`}
                   >
-                    <div>
-                      <strong>{entry.speaker === 'you' ? 'You' : 'Interviewer'}</strong>
+                    <div className="transcript-turn__content">
+                      <p>{entry.talk}</p>
                       <time dateTime={entry.capturedAt}>
                         {new Date(entry.capturedAt).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -417,7 +417,6 @@ export function ReportScreen({
                         })}
                       </time>
                     </div>
-                    <p>{entry.talk}</p>
                   </article>
                 ))
               ) : (
