@@ -73,7 +73,7 @@ export function LiveScreen({
             <span className="live-label">
               <i /> Live interview
             </span>
-            <h1>Let&apos;s talk about your experience.</h1>
+            <h1>Interview Practice</h1>
             <div className="question-message">
               <button
                 type="button"
