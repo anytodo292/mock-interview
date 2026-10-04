@@ -30,7 +30,7 @@ export function ConnectingScreen({
         </h1>
         <p>
           {retrying
-            ? `The connection timed out. Retrying ${retryCount} of ${maxRetries}...`
+            ? `The connection timed out. Retrying...`// ${retryCount} of ${maxRetries}
             : 'Please wait while we connect you to your AI interviewer.'}
         </p>
         <div className="connection-orbit">

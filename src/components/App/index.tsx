@@ -24,7 +24,7 @@ import {
   getInterviewerInfo,
   InterviewStatusType,
   LangType,
-  MAX_INTERVIEW_DURATION_SECONDS,
+  MOCK_INTERVIEW_DURATION_SECONDS,
 } from '@/constants';
 import {
   fetchEvaluation,
@@ -324,9 +324,9 @@ export default function App(): JSX.Element {
 
   useEffect(() => {
     const interviewIsActive = screen === 'live' || screen === 'thinking';
-    if (!interviewIsActive || interview.elapsedSeconds < MAX_INTERVIEW_DURATION_SECONDS) return;
+    if (!interviewIsActive || interview.elapsedSeconds < MOCK_INTERVIEW_DURATION_SECONDS) return;
 
-    const maximumMinutes = MAX_INTERVIEW_DURATION_SECONDS / 60;
+    const maximumMinutes = MOCK_INTERVIEW_DURATION_SECONDS / 60;
     setCompletionMessage(
       `The ${maximumMinutes}-minute interview limit was reached. Your session was ended automatically and your responses are being saved.`,
     );

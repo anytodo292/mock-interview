@@ -14,6 +14,7 @@ import {
 } from '../services/deepgramApi';
 import { InterviewStartParams, InterviewTranscript } from '../components/Interview/types';
 import { startAgentMicrophoneWithDevice } from '../utils/microphone';
+import { MOCK_INTERVIEW_CLOSING_PROMPT, MOCK_INTERVIEW_CLOSING_SECONDS } from '../constants';
 
 export type InterviewStatus =
   'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'ended' | 'error';
@@ -104,6 +105,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const pauseStartedAtRef = useRef<number | null>(null);
   const totalPausedMsRef = useRef(0);
   const startNotificationSentRef = useRef(false);
+  const wrapUpPromptSentRef = useRef(false);
   const connectionAttemptRef = useRef(0);
 
   callbacksRef.current = callbacks;
@@ -120,6 +122,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     sessionStartedAtRef.current = null;
     pauseStartedAtRef.current = null;
     totalPausedMsRef.current = 0;
+    wrapUpPromptSentRef.current = false;
     microphoneRef.current?.stop();
     sessionRef.current?.disconnect();
     playerRef.current?.dispose();
@@ -190,6 +193,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       setTranscriptList([]);
       transcriptIdRef.current = 0;
       startNotificationSentRef.current = false;
+      wrapUpPromptSentRef.current = false;
       setStatus('connecting');
 
       try {
@@ -382,7 +386,18 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
                 ? Date.now() - pauseStartedAtRef.current
                 : 0;
               const activeMs = Date.now() - startedAt - totalPausedMsRef.current - currentPauseMs;
-              setElapsedSeconds(Math.max(0, Math.floor(activeMs / 1000)));
+              const activeSeconds = Math.max(0, Math.floor(activeMs / 1000));
+
+              if (
+                activeSeconds >= MOCK_INTERVIEW_CLOSING_SECONDS &&
+                !wrapUpPromptSentRef.current &&
+                session.state === 'connected'
+              ) {
+                wrapUpPromptSentRef.current = true;
+                session.updatePrompt(MOCK_INTERVIEW_CLOSING_PROMPT);
+              }
+
+              setElapsedSeconds(activeSeconds);
             }, 250);
           }
           setStatus('listening');
