@@ -214,6 +214,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         const session = new AgentSession({
           auth: {
             tokenFactory: extensionToken ? async () => extensionToken : fetchDeepgramToken,
+            //  apiKey: DEEPGRAM_API_KEY,
           },
           agent: agentBuild.agent,
           audio: optimizedAudio,
