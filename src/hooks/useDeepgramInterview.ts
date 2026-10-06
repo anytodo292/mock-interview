@@ -197,7 +197,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       setStatus('connecting');
 
       try {
-        const extensionToken = interviewId ? await fetchDeepgramToken(interviewId) : null;
+        const extensionToken = await fetchDeepgramToken();
         const agentBuild = await fetchAgentBuild(params, interviewId);
         if (!isCurrentAttempt()) return;
         const inputSampleRate = agentBuild.audio?.input?.sampleRate ?? 16_000;
@@ -213,8 +213,8 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
         const session = new AgentSession({
           auth: {
-            tokenFactory: extensionToken ? async () => extensionToken : fetchDeepgramToken,
-            //  apiKey: DEEPGRAM_API_KEY,
+            // tokenFactory: extensionToken ? async () => extensionToken : fetchDeepgramToken,
+            apiKey: extensionToken,
           },
           agent: agentBuild.agent,
           audio: optimizedAudio,

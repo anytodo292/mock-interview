@@ -9,7 +9,7 @@ import {
 import { IInterview, JsonObject } from '@/types';
 import { getInterviewerInfo } from '@/constants';
 
-const TOKEN_ENDPOINT = '/practice/get_dg_token';
+const TOKEN_ENDPOINT = '/practice/get_access_token';
 const AGENT_BUILD_ENDPOINT = '/practice/get_agent_build';
 const GET_INTERVIEW_ENDPOINT = '/practice/get_interview';
 const UPLOAD_TRANSCRIPT_ENDPOINT = '/practice/upload_transcript';
@@ -100,10 +100,9 @@ function normalizeAgent(agent: unknown): AgentSettingsObject | string {
   return normalizedAgent as AgentSettingsObject;
 }
 
-export async function fetchDeepgramToken(interviewId?: number): Promise<string> {
+export async function fetchDeepgramToken(): Promise<string> {
   const res = await request(
-    TOKEN_ENDPOINT,
-    interviewId ? { interview_id: interviewId } : undefined,
+    TOKEN_ENDPOINT
   );
 
   const data = unwrap(res, ['data']);
