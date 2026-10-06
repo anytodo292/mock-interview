@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 
-import { EvaluationCompetency, InterviewEvaluation } from '../types';
+import { InterviewEvaluation } from '../types';
 import { TopBar } from '../shared/TopBar';
 import { useTheme } from '../shared/ThemeContext';
 import { DifficultyTypeList, InterviewTypeList } from '@/constants';
-import { IInterview } from '@/types';
 
 interface ReportScreenProps {
-  interview?: IInterview;
   evaluation: InterviewEvaluation | null;
   loading: boolean;
   error: string | null;
@@ -24,80 +22,7 @@ function formatDuration(totalSeconds: number): string {
   return `${seconds}s`;
 }
 
-function CompetencyRadar({ competencies }: { competencies: EvaluationCompetency[] }): JSX.Element {
-  const centerX = 210;
-  const centerY = 175;
-  const radius = 108;
-  const labelRadius = 142;
-  const angleFor = (index: number): number =>
-    -Math.PI / 2 + (index * Math.PI * 2) / competencies.length;
-  const pointAt = (index: number, distance: number): [number, number] => {
-    const angle = angleFor(index);
-    return [centerX + Math.cos(angle) * distance, centerY + Math.sin(angle) * distance];
-  };
-  const gridLevels = [0.2, 0.4, 0.6, 0.8, 1];
-  const scorePoints = competencies.map((competency, index) => {
-    const score = Math.max(0, Math.min(100, Number(competency.score) || 0));
-    return pointAt(index, radius * (score / 100));
-  });
-  const pointsAttribute = (points: Array<[number, number]>): string =>
-    points.map(([x, y]) => `${x},${y}`).join(' ');
-  const scoreDescription = competencies
-    .map(({ name, score }) => `${name}: ${score} out of 100`)
-    .join(', ');
-
-  return (
-    <div className="competency-radar">
-      <svg
-        viewBox="0 0 420 350"
-        role="img"
-        aria-label={`Competency spider chart. ${scoreDescription}`}
-      >
-        <g className="competency-radar__grid">
-          {gridLevels.map((level) => (
-            <polygon
-              key={level}
-              points={pointsAttribute(
-                competencies.map((_, index) => pointAt(index, radius * level)),
-              )}
-            />
-          ))}
-          {competencies.map(({ name }, index) => {
-            const [x, y] = pointAt(index, radius);
-            return <line key={name} x1={centerX} y1={centerY} x2={x} y2={y} />;
-          })}
-        </g>
-        <polygon className="competency-radar__score" points={pointsAttribute(scorePoints)} />
-        {competencies.map((competency, index) => {
-          const angle = angleFor(index);
-          const x = centerX + Math.cos(angle) * labelRadius;
-          const y = centerY + Math.sin(angle) * labelRadius;
-          const anchor =
-            Math.cos(angle) > 0.25 ? 'start' : Math.cos(angle) < -0.25 ? 'end' : 'middle';
-          return (
-            <g key={competency.name}>
-              <circle
-                className="competency-radar__point"
-                cx={scorePoints[index][0]}
-                cy={scorePoints[index][1]}
-                r="4"
-              />
-              <text x={x} y={y} textAnchor={anchor} dominantBaseline="middle">
-                <tspan x={x}>{competency.name}</tspan>
-                <tspan className="competency-radar__label-score" x={x} dy="15">
-                  {Math.max(0, Math.min(100, Number(competency.score) || 0))}
-                </tspan>
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-    </div>
-  );
-}
-
 export function ReportScreen({
-  interview,
   evaluation,
   loading,
   error,
@@ -194,11 +119,6 @@ export function ReportScreen({
   const difficultyLabel =
     DifficultyTypeList.find((item) => item.id === Number(evaluation.difficulty))?.text ??
     String(evaluation.difficulty);
-  
-  const infoList = [];
-  if (interview?.company) infoList.push(interview?.company);
-  if (interview?.position) infoList.push(interview?.position);
-
   const score = Math.max(0, Math.min(100, Number(evaluation.overall_score) || 0));
   const scoreAngle = score * 3.6;
 
@@ -274,9 +194,8 @@ export function ReportScreen({
         <div>
           <span className="eyebrow">Interview complete</span>
           <h1>Your detailed interview report</h1>
-          {infoList.length > 0&& <p style={{ marginBottom: 5 }}>{infoList.join(' · ')}</p>}
           <p>
-            {scenarioLabel}{' · '}{difficultyLabel}{' · '}
+            {scenarioLabel} &middot; {difficultyLabel} &middot;{' '}
             {formatDuration(evaluation.duration_seconds)}
           </p>
         </div>
@@ -337,23 +256,18 @@ export function ReportScreen({
               </div>
               <span>{evaluation.competencies.length} competencies</span>
             </div>
-            <div className="competency-breakdown">
-              {evaluation.competencies.length >= 3 && (
-                <CompetencyRadar competencies={evaluation.competencies} />
-              )}
-              <div className="competency-list">
-                {evaluation.competencies.map(({ name, score }) => (
-                  <div className="competency-row" key={name}>
-                    <div>
-                      <strong>{name}</strong>
-                      <span>{score}/100</span>
-                    </div>
-                    <div className="competency-track" aria-label={`${name}: ${score} out of 100`}>
-                      <i style={{ width: `${Math.max(0, Math.min(100, score))}%` }} />
-                    </div>
+            <div className="competency-list">
+              {evaluation.competencies.map(({ name, score }) => (
+                <div className="competency-row" key={name}>
+                  <div>
+                    <strong>{name}</strong>
+                    <span>{score}/100</span>
                   </div>
-                ))}
-              </div>
+                  <div className="competency-track" aria-label={`${name}: ${score} out of 100`}>
+                    <i style={{ width: `${Math.max(0, Math.min(100, score))}%` }} />
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -372,12 +286,7 @@ export function ReportScreen({
                       <i>{icon}</i>
                       {title}
                     </span>
-                    <b aria-hidden="true">
-                      <svg viewBox="0 0 24 24">
-                        <path d="M5 12h14" />
-                        {!open && <path d="M12 5v14" />}
-                      </svg>
-                    </b>
+                    <b aria-hidden="true">{open ? '−' : '+'}</b>
                   </button>
                   {open && (
                     <div>
@@ -408,8 +317,8 @@ export function ReportScreen({
                     className={`transcript-turn transcript-turn--${entry.speaker}`}
                     key={entry.id ?? `${entry.capturedAt}-${index}`}
                   >
-                    <div className="transcript-turn__content">
-                      <p>{entry.talk}</p>
+                    <div>
+                      <strong>{entry.speaker === 'you' ? 'You' : 'Interviewer'}</strong>
                       <time dateTime={entry.capturedAt}>
                         {new Date(entry.capturedAt).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -417,6 +326,7 @@ export function ReportScreen({
                         })}
                       </time>
                     </div>
+                    <p>{entry.talk}</p>
                   </article>
                 ))
               ) : (
@@ -426,12 +336,13 @@ export function ReportScreen({
           </section>
 
           <div className="report-actions">
+            <div></div>
             <button className="primary-button" onClick={downloadReport}>
               Download report
             </button>
-            <button className="secondary-button" onClick={onAgain}>
+            {/* <button className="secondary-button" onClick={onAgain}>
               Practice again
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

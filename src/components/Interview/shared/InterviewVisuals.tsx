@@ -1,17 +1,56 @@
 import React from 'react';
-
-import interviewer from 'images/interviewer.png';
+import { Interviewer, MOCK_INTERVIEW_DURATION_SECONDS } from '@/constants';
+import { IInterview } from '@/types';
 
 const waveHeights = [
   10, 18, 30, 16, 38, 24, 44, 20, 34, 14, 27, 42, 18, 31, 12, 22, 36, 17, 26, 10,
 ];
 
-export function Avatar({ small = false }: { small?: boolean }): JSX.Element {
+export function Avatar({
+  interviewer,
+  small = false,
+}: {
+  interviewer: Interviewer;
+  small?: boolean;
+}): JSX.Element {
   return (
     <img
       className={`avatar ${small ? 'avatar--small' : ''}`}
-      src={interviewer}
-      alt="Emma, AI interviewer"
+      src={interviewer.image}
+      alt={`${interviewer.name}, AI interviewer`}
+    />
+  );
+}
+
+export function SpeakingPortrait({
+  interviewer,
+  isSpeaking,
+  staticImage = false,
+}: {
+  interviewer: Interviewer;
+  isSpeaking: boolean;
+  staticImage?: boolean;
+}): JSX.Element {
+  const portraitState = staticImage ? 'static' : isSpeaking ? 'speaking' : 'idle';
+
+  return (
+    <img
+      key={portraitState}
+      className="portrait-frame portrait-frame--visible"
+      src={
+        staticImage
+          ? interviewer.image
+          : isSpeaking
+            ? interviewer.anim_speak
+            : interviewer.anim_listen
+      }
+      alt={
+        staticImage
+          ? `${interviewer.name}, AI interviewer`
+          : isSpeaking
+            ? `${interviewer.name} speaking`
+            : `${interviewer.name} waiting for your response`
+      }
     />
   );
 }
@@ -26,22 +65,48 @@ export function Waveform({ green = false }: { green?: boolean }): JSX.Element {
   );
 }
 
-export function InterviewerIdentity({ time = '08:42' }: { time?: string }): JSX.Element {
+export function InterviewerIdentity({
+  interviewer,
+  interviewInfo,
+  elapsedSeconds = 0,
+}: {
+  interviewer: Interviewer;
+  interviewInfo?: IInterview;
+  elapsedSeconds?: number;
+}): JSX.Element {
+  const formatTime = (totalSeconds: number): string => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [hours, minutes, seconds]
+      .filter((_, index) => hours > 0 || index > 0)
+      .map((value) => value.toString().padStart(2, '0'))
+      .join(':');
+  };
+  const elapsedTime = formatTime(Math.min(elapsedSeconds, MOCK_INTERVIEW_DURATION_SECONDS));
+  const maximumTime = formatTime(MOCK_INTERVIEW_DURATION_SECONDS);
+
   return (
     <div className="identity">
-      <Avatar small />
+      <Avatar interviewer={interviewer} small />
       <div>
         <strong>
-          Emma <span className="verified">&#10003;</span>
+          {interviewer.name}{' '}
+          <span className="verified">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="m3 8.25 3.1 3.1L13 4.75" fill="none" stroke="currentColor" strokeWidth="2" />
+            </svg>
+          </span>
         </strong>
-        <small>Senior Engineering Manager</small>
-        <small>Google</small>
+        <small>{interviewInfo?.position ?? '--'}</small>
+        <small>{interviewInfo?.company ?? '--'}</small>
       </div>
       <div className="identity__time">
-        {time} <i />
+        <span aria-label={`${elapsedTime} elapsed of ${maximumTime} maximum`}>
+          {elapsedTime} / {maximumTime}
+        </span>{' '}
+        <i />
       </div>
     </div>
   );
 }
-
-export { interviewer };

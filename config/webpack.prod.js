@@ -11,7 +11,7 @@ module.exports = merge(common, {
 
   output: {
     path: paths.build,
-    publicPath: '/',
+    publicPath: process.env.PUBLIC_URL,
     filename: 'js/[name].[contenthash].bundle.js',
   },
 

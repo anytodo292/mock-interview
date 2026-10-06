@@ -1,154 +1,218 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { Avatar, Waveform } from '../shared/InterviewVisuals';
 import { TopBar } from '../shared/TopBar';
+import { useTheme } from '../shared/ThemeContext';
+import { MockInterviewParams } from '../types';
+import {
+  getInterviewerInfo,
+  InterviewType,
+  LangType,
+  DifficultyType,
+  InterviewTypeList,
+  LangTypeList,
+  DifficultyTypeList,
+  InterviewerInfo,
+} from '@/constants';
+import { IInterview } from '@/types';
 
 interface HomeScreenProps {
-  onStart: () => void;
+  onStart: (params: MockInterviewParams) => void;
+  initialParams?: MockInterviewParams;
+  lockInterview?: boolean;
+  interviewInfo?: IInterview;
+  deviceCheckError?: string | null;
+  onDismissDeviceCheckError?: () => void;
 }
 
-const InterviewType = {
-  // QUICK_CALL: -1,
-  TECH_INTERVIEW: 0,
-  // HR_INTERVIEW: 1,
-  TEAM_MEETING: 2,
-  CLIENT_MEETING: 3,
-  CONSULTING: 4,
-  CASUAL_CONVERSATION: 5,
-  ONLINE_ASSESSMENT: 6,
+function CheckIcon(): JSX.Element {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path d="m3 8.25 3.1 3.1L13 4.75" fill="none" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
 
-  SCREENING_INTERVIEW: 7,
-  CODING_INTERVIEW: 8,
-  SYS_DESGIN_INTERVIEW: 9,
-  BEHAV_INTERVIEW: 10,
-  CASE_INTERVIEW: 11,
-  SITUATION_INTERVIEW: 12,
-  CULTURE_INTERVIEW: 13,
-  FINAL_INTERVIEW: 14,
-  AI_INTERVIEW: 15,
-};
+function ChevronIcon({ direction }: { direction: 'left' | 'right' }): JSX.Element {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d={direction === 'left' ? 'm12.5 4.5-5 5.5 5 5.5' : 'm7.5 4.5 5 5.5-5 5.5'}
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
 
-const LangType = {
-  CHINESE: 0,
-  DUTCH: 1,
-  ENGLISH: 2,
-  FRENCH: 3,
-  GERMAN: 4,
-  ITALIAN: 5,
-  JAPANESE: 6,
-  SPANISH: 7,
-  RUSSIAN: 8,
-  ARABIC: 9,
-  PORTUGUESE: 10,
-  KOREAN: 11,
-};
+export function HomeScreen({
+  onStart,
+  initialParams,
+  interviewInfo,
+  deviceCheckError,
+  onDismissDeviceCheckError,
+}: HomeScreenProps): JSX.Element {
+  const scenario = initialParams?.scenario ?? InterviewType.TECH_INTERVIEW;
+  const { theme } = useTheme();
 
-const DifficultyType = {
-  Junior: 0,
-  Mid: 1,
-  Senior: 2,
-};
+  const [selectedInterviewerIdx, setSelectedInterviewerIdx] = useState<number>(
+    initialParams?.interviewerIndex ?? 0,
+  );
+  const language = initialParams?.language ?? LangType.ENGLISH;
+  const [difficulty, setDifficulty] = useState<number>(
+    initialParams?.difficulty ?? DifficultyType.Senior,
+  );
+  const selectedInterviewer = getInterviewerInfo(selectedInterviewerIdx);
+  const interviewTypeLabel =
+    InterviewTypeList.find((item) => item.id === scenario)?.text ?? 'Interview';
+  const languageLabel =
+    LangTypeList.find((item) => item.id === language)?.country ?? 'Unknown language';
+  const interviewerOptionRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
-export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
-  const InterviewTypeList: { id: number; text: string }[] = [
-    { id: InterviewType.SCREENING_INTERVIEW, text: 'Screening Interview' },
-    { id: InterviewType.TECH_INTERVIEW, text: 'Technical Interview' },
-    { id: InterviewType.CODING_INTERVIEW, text: 'Coding Interview' },
-    { id: InterviewType.SYS_DESGIN_INTERVIEW, text: 'System Design Interview' },
-    { id: InterviewType.BEHAV_INTERVIEW, text: 'Behavioral Interview' },
-    { id: InterviewType.CASE_INTERVIEW, text: 'Case Interview' },
-    { id: InterviewType.SITUATION_INTERVIEW, text: 'Situational Interview' },
-    { id: InterviewType.CULTURE_INTERVIEW, text: 'Culture Fit Interview' },
-    { id: InterviewType.FINAL_INTERVIEW, text: 'Hiring Manager Interview' },
-    { id: InterviewType.AI_INTERVIEW, text: 'AI-Driven Interview' },
-    { id: InterviewType.TEAM_MEETING, text: 'Team Meeting' },
-    { id: InterviewType.CLIENT_MEETING, text: 'Client Meeting' },
-    { id: InterviewType.CONSULTING, text: 'Consultation Meeting' },
-    { id: InterviewType.CASUAL_CONVERSATION, text: 'Casual Conversation' },
-    { id: InterviewType.ONLINE_ASSESSMENT, text: 'Online Assessment' },
-  ];
+  useEffect(() => {
+    interviewerOptionRefs.current[selectedInterviewerIdx]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    });
+  }, [selectedInterviewerIdx]);
 
-  const LangTypeList = [
-    { id: LangType.ARABIC, country: 'Arabic (العربية)', deepgramCode: 'ar' },
-    { id: LangType.CHINESE, country: 'Chinese (中文)', deepgramCode: 'zh' },
-    { id: LangType.DUTCH, country: 'Dutch (Nederlands)', deepgramCode: 'nl' },
-    { id: LangType.ENGLISH, country: 'English (US)', deepgramCode: 'en' },
-    { id: LangType.FRENCH, country: 'French (Français)', deepgramCode: 'fr' },
-    { id: LangType.GERMAN, country: 'German (Deutsch)', deepgramCode: 'de' },
-    { id: LangType.ITALIAN, country: 'Italian (Italiano)', deepgramCode: 'it' },
-    { id: LangType.JAPANESE, country: 'Japanese (日本語)', deepgramCode: 'ja' },
-    { id: LangType.KOREAN, country: 'Korean (한국어)', deepgramCode: 'ko' },
-    { id: LangType.PORTUGUESE, country: 'Portuguese (Português)', deepgramCode: 'pt' },
-    { id: LangType.SPANISH, country: 'Spanish (Español)', deepgramCode: 'es' },
-    { id: LangType.RUSSIAN, country: 'Russian (Русский)', deepgramCode: 'ru' },
-  ];
+  useEffect(() => {
+    if (!deviceCheckError || !onDismissDeviceCheckError) return;
 
-  const DifficultyTypeList: { id: number; text: string }[] = [
-    { id: DifficultyType.Junior, text: 'Junior' },
-    { id: DifficultyType.Mid, text: 'Mid-Level' },
-    { id: DifficultyType.Senior, text: 'Senior' },
-  ];
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') onDismissDeviceCheckError();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [deviceCheckError, onDismissDeviceCheckError]);
 
-  const handleMockInterviewStartClick = (): void => {};
+  const moveInterviewerSelection = (direction: -1 | 1): void => {
+    setSelectedInterviewerIdx(
+      (currentIndex) =>
+        (currentIndex + direction + InterviewerInfo.length) % InterviewerInfo.length,
+    );
+  };
+
+  const handleMockInterviewStartClick = (): void => {
+    onStart({ scenario, language, difficulty, interviewerIndex: selectedInterviewerIdx });
+  };
 
   return (
-    <section className="screen screen--light home-screen">
+    <section className={`screen screen--${theme} home-screen`}>
       <TopBar />
       <div className="home-grid">
         <div className="home-copy">
           <span className="eyebrow">AI-powered practice</span>
           <h1>Walk into your next interview with confidence.</h1>
           <p>
-            Practice with Emma, your realistic AI interviewer, and get focused feedback after every
-            session.
+            Practice with {selectedInterviewer.name}, your realistic AI interviewer, and get focused
+            feedback after every session.
           </p>
           <div className="benefit-row">
-            <span>&#10003; Real interview questions</span>
-            <span>&#10003; Instant coaching report</span>
+            <span>
+              <CheckIcon /> Real interview questions
+            </span>
+            <span>
+              <CheckIcon /> Instant coaching report
+            </span>
           </div>
         </div>
 
         <div className="setup-card">
-          <div className="profile-block">
-            <div className="profile-visual">
-              <Waveform />
-              <Avatar />
-              <span className="online">Online</span>
+          <div className="interviewer-picker">
+            <div className="setup-heading">
+              <div>
+                <span className="setup-heading__eyebrow">Choose your interviewer</span>
+                <h2>{selectedInterviewer.name}</h2>
+              </div>
+              <span className="availability">
+                <i /> Available
+              </span>
             </div>
-            <h2>
-              Emma <span className="verified">&#10003;</span>
-            </h2>
-            <p>
-              Senior Engineering Manager
-              <br />
-              Google &middot; 15+ years experience
-            </p>
+
+            <div className="interviewer-slider">
+              <button
+                type="button"
+                className="slider-arrow"
+                aria-label="Select previous interviewer"
+                onClick={() => moveInterviewerSelection(-1)}
+              >
+                <ChevronIcon direction="left" />
+              </button>
+              <div className="interviewer-track" role="list" aria-label="Available interviewers">
+                {InterviewerInfo.map((interviewer, index) => {
+                  const selected = index === selectedInterviewerIdx;
+                  return (
+                    <button
+                      type="button"
+                      role="listitem"
+                      key={interviewer.name}
+                      ref={(element) => {
+                        interviewerOptionRefs.current[index] = element;
+                      }}
+                      className={`interviewer-option${selected ? ' is-selected' : ''}`}
+                      aria-pressed={selected}
+                      onClick={() => setSelectedInterviewerIdx(index)}
+                    >
+                      <span className="interviewer-option__portrait">
+                        <img src={interviewer.image} alt="" />
+                        {selected && (
+                          <i>
+                            <CheckIcon />
+                          </i>
+                        )}
+                      </span>
+                      <span>{interviewer.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                type="button"
+                className="slider-arrow"
+                aria-label="Select next interviewer"
+                onClick={() => moveInterviewerSelection(1)}
+              >
+                <ChevronIcon direction="right" />
+              </button>
+            </div>
+          </div>
+
+          <div className="interview-summary">
+            <div className="profile-labels" aria-label="Interview details">
+              <span>{interviewTypeLabel}</span>
+              <span>{languageLabel}</span>
+            </div>
+            <dl className="interview-meta">
+              <div>
+                <dt>Position</dt>
+                <dd>
+                  {interviewInfo?.position && interviewInfo.position.length > 0
+                    ? interviewInfo.position
+                    : '--'}
+                </dd>
+              </div>
+              <div>
+                <dt>Company</dt>
+                <dd>
+                  {interviewInfo?.company && interviewInfo.company.length > 0
+                    ? interviewInfo.company
+                    : '--'}
+                </dd>
+              </div>
+            </dl>
           </div>
 
           <div className="form-grid u-mb-4">
             <label>
-              Interview type
-              <select defaultValue="technical">
-                {InterviewTypeList.map((v, index) => (
-                  <option key={index} value={v.id}>
-                    {v.text}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Language
-              <select defaultValue="30">
-                {LangTypeList.map((v, index) => (
-                  <option key={index} value={v.id}>
-                    {v.country}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
               Difficulty
-              <select defaultValue="senior">
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(parseInt(e.target.value, 10))}
+              >
                 {DifficultyTypeList.map((v, index) => (
                   <option key={index} value={v.id}>
                     {v.text}
@@ -176,10 +240,38 @@ export function HomeScreen({ onStart }: HomeScreenProps): JSX.Element {
           </div> */}
 
           <button className="primary-button" onClick={handleMockInterviewStartClick}>
-            &#9673; Start mock interview <span>&rarr;</span>
+            Start mock interview
           </button>
         </div>
       </div>
+      {deviceCheckError && (
+        <div
+          className="device-alert"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) onDismissDeviceCheckError?.();
+          }}
+        >
+          <div
+            className="device-alert__dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="device-alert-title"
+            aria-describedby="device-alert-message"
+          >
+            <h2 id="device-alert-title">Device check</h2>
+            <p id="device-alert-message">{deviceCheckError}</p>
+            <button
+              type="button"
+              className="primary-button"
+              autoFocus
+              onClick={onDismissDeviceCheckError}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

@@ -1,5 +1,12 @@
 const pathtoresolve = require('path');
+const webpack = require('webpack')
 const paths = require('./paths')
+
+try {
+  process.loadEnvFile(pathtoresolve.resolve(__dirname, `../.env.${process.env.NODE_ENV}`))
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error
+}
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -22,25 +29,28 @@ module.exports = {
     publicPath: '/',
   },
 
-
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
     alias: {
+      '@': pathtoresolve.resolve(__dirname, '../src'),
       'components': pathtoresolve.resolve(__dirname, '../src/components/'),
       'images': pathtoresolve.resolve(__dirname, '../src/images/'),
       'styles': pathtoresolve.resolve(__dirname, '../src/styles/'),
     }
   },
 
-
   // Customize the webpack build process
   plugins: [
-
-
     //new FriendlyErrorsPlugin(),
-
     // Removes/cleans build folders and unused assets when rebuilding
     new CleanWebpackPlugin(),
+
+    // Expose only the public backend URL, not the rest of the server environment.
+    new webpack.DefinePlugin({
+      __BACKEND_API_URL__: JSON.stringify(process.env.BACKEND_API_URL || ''),
+      __PUBLIC_URL__: JSON.stringify(process.env.PUBLIC_URL || ''),
+      __EXTENSION_ID__: JSON.stringify(process.env.EXTENSION_ID || '')
+    }),
 
     new ForkTsCheckerWebpackPlugin({
       async: false,
@@ -71,10 +81,8 @@ module.exports = {
   // Determine how modules within the project are treated
   module: {
     rules: [
-
       // Note: These 2 rules could likely be handled in one test: statement.
       // However, using 2 seperate statements each sttament could have different options if needed
-
       // Use Babel to transpile JavaScript ES6+ / React files to ES5
       {
         test: /\.(jsx|js)$/,

@@ -1,59 +1,162 @@
 import React from 'react';
 
+import { FinishedInterview } from '../types';
 import { TopBar } from '../shared/TopBar';
-
-const scores = [
-  ['Communication', 90, 'green'],
-  ['Technical knowledge', 84, 'blue'],
-  ['Problem solving', 88, 'purple'],
-  ['Confidence', 81, 'orange'],
-  ['Structure & clarity', 85, 'blue'],
-] as const;
+import { useTheme } from '../shared/ThemeContext';
+import { DifficultyTypeList, InterviewStatusLabels, InterviewTypeList } from '@/constants';
+import { IInterview } from '@/types';
 
 interface FinishedScreenProps {
-  onReport?: () => void;
+  interview?: IInterview;
+  result: FinishedInterview | null;
+  loading: boolean;
+  error: string | null;
+  onRetry: () => void;
+  onReport: () => void;
   onAgain: () => void;
+  completionMessage?: string | null;
 }
 
-function ScoreRing(): JSX.Element {
-  return (
-    <div className="score-ring">
-      <div>
-        <strong>87</strong>
-        <span>Overall score</span>
-      </div>
-    </div>
-  );
+function formatDuration(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+  if (minutes > 0) return `${minutes}m ${seconds}s`;
+  return `${seconds}s`;
 }
 
-export function FinishedScreen({ onReport, onAgain }: FinishedScreenProps): JSX.Element {
+export function FinishedScreen({
+  interview,
+  result,
+  loading,
+  error,
+  onRetry,
+  onReport,
+  onAgain,
+  completionMessage,
+}: FinishedScreenProps): JSX.Element {
+  const { theme } = useTheme();
+
+  if (loading) {
+    return (
+      <section className={`screen screen--${theme} results-screen`}>
+        <TopBar />
+        <div className="report-state" role="status" aria-live="polite">
+          <div className="loading-interview__spinner" aria-hidden="true" />
+          <span className="eyebrow">Finishing interview</span>
+          <h1>Wrapping up your interview...</h1>
+          <p>
+            {completionMessage ??
+              "We're uploading the final conversation and preparing your results."}
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !result) {
+    return (
+      <section className={`screen screen--${theme} results-screen`}>
+        <TopBar />
+        <div className="report-state" role="alert">
+          <div className="blocking-state__icon" aria-hidden="true">
+            !
+          </div>
+          <span className="eyebrow">Unable to save results</span>
+          <h1>We couldn&apos;t finish your interview.</h1>
+          <p>{error ?? 'The interview summary is unavailable.'}</p>
+          <div className="blocking-state__actions">
+            <button className="primary-button" onClick={onRetry}>
+              Try again
+            </button>
+            <button className="secondary-button" onClick={onAgain}>
+              Return home
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const infoList = [];
+  if (interview?.company) infoList.push(interview?.company);
+  if (interview?.position) infoList.push(interview?.position);
+
+  const scenarioLabel =
+    InterviewTypeList.find((item) => item.id === result.scenario)?.text ?? 'Interview';
+  const difficultyLabel =
+    DifficultyTypeList.find((item) => item.id === Number(result.difficulty))?.text ??
+    String(result.difficulty);
+  const statusLabel = InterviewStatusLabels[result.status] ?? 'Unknown';
+
+  const score = Math.max(0, Math.min(100, Number(result.overall_score) || 0));
+  const scoreAngle = score * 3.6;
+
   return (
-    <section className="screen screen--light results-screen">
+    <section className={`screen screen--${theme} results-screen`}>
       <TopBar />
       <div className="results-layout">
         <div className="result-hero">
-          <span className="confetti">&#10022; &middot; &#10023;</span>
-          <ScoreRing />
-          <span className="great-job">Great job!</span>
-          <h1>You showed strong senior-level skills.</h1>
-          <p>Your answers were clear, thoughtful, and grounded in real-world experience.</p>
-        </div>
-        <div className="score-card">
-          <h2>Performance breakdown</h2>
-          {scores.map(([label, score, color]) => (
-            <div className="score-row" key={label}>
-              <span>{label}</span>
-              <div>
-                <i className={`score-fill score-fill--${color}`} style={{ width: `${score}%` }} />
-              </div>
-              <strong className={`text-${color}`}>{score}</strong>
+          <span className="confetti" aria-hidden="true">
+            &#10022; &middot; &#10023;
+          </span>
+          <div
+            className="score-ring"
+            style={{
+              background: `conic-gradient(#1ec67c 0deg ${scoreAngle}deg, #e4e8ee ${scoreAngle}deg 360deg)`,
+            }}
+          >
+            <div>
+              <strong>{result.overall_score}</strong>
+              <span>Overall score</span>
             </div>
-          ))}
-          <button className="primary-button" onClick={onReport}>
-            &#9636; View detailed report <span>&rarr;</span>
-          </button>
+          </div>
+          {/* <span className="great-job">Interview complete</span> */}
+          <h1>Your mock interview is finished.</h1>
+          <p>
+            {completionMessage ??
+              'Your responses have been saved and your evaluation is ready to review.'}
+          </p>
+        </div>
+
+        <div className="completion-card finished-summary-card">
+          <div className="finished-summary-card__heading">
+            <div>
+              <span className="eyebrow">Session summary</span>
+              <h2>{scenarioLabel}</h2>
+            </div>
+            <span className="finished-status">{statusLabel}</span>
+          </div>
+          {infoList.length > 0&& <p style={{ marginBottom: 5 }}>{infoList.join(' · ')}</p>}
+          <dl className="session-summary">
+            {/* <div>
+              <dt>Interview ID</dt>
+              <dd>{result.interview_id}</dd>
+            </div> */}
+            
+            <div>
+              <dt>Difficulty</dt>
+              <dd>{difficultyLabel}</dd>
+            </div>
+            <div>
+              <dt>Duration</dt>
+              <dd>{formatDuration(result.duration_seconds)}</dd>
+            </div>
+            <div>
+              <dt>Overall score</dt>
+              <dd>{result.overall_score}/100</dd>
+            </div>
+          </dl>
+          {result.report_available ? (
+            <button className="primary-button completion-card__restart" onClick={onReport}>
+              View evaluation report
+            </button>
+          ) : (
+            <p className="report-pending">Your detailed evaluation is still being prepared.</p>
+          )}
           <button className="secondary-button" onClick={onAgain}>
-            &#8635; Practice again
+            Practice again
           </button>
         </div>
       </div>

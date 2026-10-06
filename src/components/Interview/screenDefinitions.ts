@@ -4,7 +4,10 @@ export const screenDefinitions: ScreenDefinition[] = [
   { id: 'home', label: 'Home' },
   { id: 'connecting', label: 'Connecting' },
   { id: 'live', label: 'Live interview' },
-  // { id: 'thinking', label: 'AI thinking' },
+  { id: 'thinking', label: 'AI thinking' },
   { id: 'finished', label: 'Finished' },
-  // { id: 'report', label: 'Detailed report' },
+  { id: 'report', label: 'Detailed report' },
+  { id: 'invalid', label: 'Invalid interview' },
+  { id: 'install-extension', label: 'Install extension' },
+  { id: 'loading', label: 'Loading interview' },
 ];
