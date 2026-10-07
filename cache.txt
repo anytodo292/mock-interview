@@ -1,0 +1,15 @@
+
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/daan_listen.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/daan_speak.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/ebius_listen.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/ebius_speak.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/emma_listen.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/emma_speak.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/fabian_listen.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/fabian_speak.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/falvio_listen.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/falvio_speak.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/hector_listen.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/hector_speak.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/nestor_listen.gif" fetchpriority="high" />
+<link rel="preload" as="image" href="https://ntro-interview.github.io/assets/dev/mock/assets/images/nestor_speak.gif" fetchpriority="high" />
