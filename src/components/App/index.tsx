@@ -135,45 +135,50 @@ export default function App(): JSX.Element {
 
     localStorage.setItem('_ms-id', msId);
 
-    if (evaluationRoute) {
-      fetchInterview(interviewId).then(record => {
-        if (record) {
-          setInterviewInfo(record);
+    // if (evaluationRoute) {
+      fetchInterview(interviewId).then(
+        (record) => {
+          if (record) {
+            setInterviewInfo(record);
+          }
+        }, 
+        () => {
+          setScreen('invalid');
         }
-      });
+      );
       gotoEvaluation();
       return;
-    }
+    // }
 
-    void fetchInterview(interviewId).then(
-      (record: IInterview | null) => {
-        if (!record) {
-          setScreen('invalid');
-          return;
-        }
+    // void fetchInterview(interviewId).then(
+    //   (record: IInterview | null) => {
+    //     if (!record) {
+    //       setScreen('invalid');
+    //       return;
+    //     }
 
-        // const arr: number[] = [InterviewStatusType.Finished, InterviewStatusType.Complete, InterviewStatusType.Evaluating];
-        // if (record.status && arr.includes(record.status)) {
-        //   gotoEvaluation();
-        //   return;
-        // }
-        setInterviewInfo(record);
-        setExtensionParams({
-          language: record.lang,
-          scenario: record.scenario,
-          difficulty: DifficultyType.Mid,
-          interviewerIndex: 0,
-        });
-        setSelectedLanguage(record.lang);
-        // if (record.status === InterviewStatusType.Active) 
-        syncInterviewStatusCookie(InterviewStatusType.Ready);
+    //     // const arr: number[] = [InterviewStatusType.Finished, InterviewStatusType.Complete, InterviewStatusType.Evaluating];
+    //     // if (record.status && arr.includes(record.status)) {
+    //     //   gotoEvaluation();
+    //     //   return;
+    //     // }
+    //     setInterviewInfo(record);
+    //     setExtensionParams({
+    //       language: record.lang,
+    //       scenario: record.scenario,
+    //       difficulty: DifficultyType.Mid,
+    //       interviewerIndex: 0,
+    //     });
+    //     setSelectedLanguage(record.lang);
+    //     // if (record.status === InterviewStatusType.Active) 
+    //     syncInterviewStatusCookie(InterviewStatusType.Ready);
 
-        setScreen('home');
-      },
-      () => {
-        setScreen('invalid');
-      },
-    );
+    //     setScreen('home');
+    //   },
+    //   () => {
+    //     setScreen('invalid');
+    //   },
+    // );
   }, [evaluationRoute, hasInterviewQuery, interviewId, msId]);
 
   useEffect(() => {
