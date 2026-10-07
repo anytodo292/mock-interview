@@ -6,6 +6,7 @@ declare module '*.scss';
 
 declare const __BACKEND_API_URL__: string;
 declare const __PUBLIC_URL__: string;
+declare const __ASSETS_URL__: string;
 declare const __EXTENSION_ID__: string;
 
 declare const chrome: any;

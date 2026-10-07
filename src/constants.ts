@@ -110,23 +110,23 @@ export const InterviewerInfo: Interviewer[] = [
   {
     name: 'Emma',
     gender: 'f',
-    anim_speak: `${__PUBLIC_URL__}/assets/images/emma_speak.gif`,
-    anim_listen: `${__PUBLIC_URL__}/assets/images/emma_listen.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/emma.png`,
+    anim_speak: `${__ASSETS_URL__}/assets/images/emma_speak.gif`,
+    anim_listen: `${__ASSETS_URL__}/assets/images/emma_listen.gif`,
+    image: `${__ASSETS_URL__}/assets/images/emma.png`,
   },
   {
     name: 'Daan',
     gender: 'm',
-    anim_speak: `${__PUBLIC_URL__}/assets/images/daan_speak.gif`,
-    anim_listen: `${__PUBLIC_URL__}/assets/images/daan_listen.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/daan.png`,
+    anim_speak: `${__ASSETS_URL__}/assets/images/daan_speak.gif`,
+    anim_listen: `${__ASSETS_URL__}/assets/images/daan_listen.gif`,
+    image: `${__ASSETS_URL__}/assets/images/daan.png`,
   },
   {
     name: 'Hector',
     gender: 'f',
-    anim_speak: `${__PUBLIC_URL__}/assets/images/hector_speak.gif`,
-    anim_listen: `${__PUBLIC_URL__}/assets/images/hector_listen.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/hector.png`,
+    anim_speak: `${__ASSETS_URL__}/assets/images/hector_speak.gif`,
+    anim_listen: `${__ASSETS_URL__}/assets/images/hector_listen.gif`,
+    image: `${__ASSETS_URL__}/assets/images/hector.png`,
   },
   {
     name: 'Fabian',
@@ -138,9 +138,9 @@ export const InterviewerInfo: Interviewer[] = [
   {
     name: 'Flavio',
     gender: 'm',
-    anim_speak: `${__PUBLIC_URL__}/assets/images/falvio_speak.gif`,
-    anim_listen: `${__PUBLIC_URL__}/assets/images/falvio_listen.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/falvio.png`,
+    anim_speak: `${__ASSETS_URL__}/assets/images/falvio_speak.gif`,
+    anim_listen: `${__ASSETS_URL__}/assets/images/falvio_listen.gif`,
+    image: `${__ASSETS_URL__}/assets/images/falvio.png`,
   },
   {
     name: 'Ebisu',
@@ -152,9 +152,9 @@ export const InterviewerInfo: Interviewer[] = [
   {
     name: 'Nestor',
     gender: 'm',
-    anim_speak: `${__PUBLIC_URL__}/assets/images/nestor_speak.gif`,
-    anim_listen: `${__PUBLIC_URL__}/assets/images/nestor_listen.gif`,
-    image: `${__PUBLIC_URL__}/assets/images/nestor.png`,
+    anim_speak: `${__ASSETS_URL__}/assets/images/nestor_speak.gif`,
+    anim_listen: `${__ASSETS_URL__}/assets/images/nestor_listen.gif`,
+    image: `${__ASSETS_URL__}/assets/images/nestor.png`,
   },
 ];
 
