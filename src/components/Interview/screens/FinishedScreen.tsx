@@ -155,9 +155,9 @@ export function FinishedScreen({
           ) : (
             <p className="report-pending">Your detailed evaluation is still being prepared.</p>
           )}
-          <button className="secondary-button" onClick={onAgain}>
+          {/* <button className="secondary-button" onClick={onAgain}>
             Practice again
-          </button>
+          </button> */}
         </div>
       </div>
     </section>

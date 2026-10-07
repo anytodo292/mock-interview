@@ -233,6 +233,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           autoGainControl: true,
         });
         let connectionEstablished = false;
+        let initialGreetingCompleted = false;
         let resolveInitialConnection: () => void = () => undefined;
         let rejectInitialConnection: (reason: Error) => void = () => undefined;
         const initialConnectionReady = new Promise<void>((resolve, reject) => {
@@ -344,6 +345,12 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
             playbackMonitorRef.current = null;
             setAgentSpeaking(false);
+            if (!initialGreetingCompleted) {
+              initialGreetingCompleted = true;
+              if (!mutedRef.current && !pausedRef.current) {
+                microphone.unmute();
+              }
+            }
             // pre-buffering-anthony
             // if (!mutedRef.current && !pausedRef.current) microphone.unmute();
             if (!pausedRef.current) setStatus('listening');
@@ -425,6 +432,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('user-started-speaking', () => {
           if (!isCurrentAttempt()) return;
+          if (!initialGreetingCompleted) return;
           player.interrupt();
           // pre-buffering-anthony
           // if (bufferedAudioBytes > 0 || player.getRemainingPlaybackTime() > 0.05) return;
@@ -499,6 +507,11 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           player.dispose();
           return;
         }
+        // Do not send microphone startup frames while the initial greeting is
+        // playing. Chrome's input processing can emit a short transient while
+        // echo cancellation and automatic gain control settle, which Deepgram
+        // may otherwise interpret as an interruption.
+        microphone.mute();
         await startAgentMicrophoneWithDevice(microphone, microphoneDeviceId);
       } catch (startError) {
         if (!isCurrentAttempt()) return;
