@@ -2150,6 +2150,29 @@ button {
     color: #92a9ae;
   }
 
+  .device-alert__settings-link {
+    padding: 0;
+    border: 0;
+    color: var(--practice-accent, #5bd7c7);
+    background: transparent;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: currentColor;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+
+  .device-alert__settings-link:hover,
+  .device-alert__settings-link:focus-visible {
+    color: #ffffff;
+  }
+
+  .device-alert__settings-link:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 2px;
+  }
+
   .guidance-steps li {
     border-color: #22353d;
   }
