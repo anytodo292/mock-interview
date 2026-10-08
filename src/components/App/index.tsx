@@ -247,6 +247,7 @@ export default function App(): JSX.Element {
 
       microphoneDeviceId = await getDefaultMicrophoneDeviceId();
       microphoneTestStream = await getMicrophoneStream(microphoneDeviceId);
+      const microphoneTrack = microphoneTestStream.getAudioTracks()[0];
       const hasMicrophone = microphoneTestStream.getAudioTracks().length > 0;
       const devices = await navigator.mediaDevices.enumerateDevices();
       const hasSoundOutput = devices.some(({ kind }) => kind === 'audiooutput');
@@ -261,6 +262,12 @@ export default function App(): JSX.Element {
         );
         return;
       }
+
+      if (microphoneTrack.muted || !microphoneTrack.enabled) {
+        setDeviceCheckError('Microphone is muted. Unmute it, then try again.');
+        return;
+      }
+      
     } catch (deviceError) {
       const permissionDenied =
         deviceError instanceof DOMException &&
