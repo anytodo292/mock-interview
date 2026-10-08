@@ -240,7 +240,7 @@ export default function App(): JSX.Element {
     try {
       if (!navigator.mediaDevices?.getUserMedia || !navigator.mediaDevices.enumerateDevices) {
         setDeviceCheckError(
-          'Microphone and sound devices cannot be checked in this browser. Please use a supported browser and try again.',
+          'We couldn\'t check your microphone or speakers/headphones in this browser.',
         );
         return;
       }
@@ -252,12 +252,12 @@ export default function App(): JSX.Element {
       const hasSoundOutput = devices.some(({ kind }) => kind === 'audiooutput');
 
       if (!hasMicrophone || !hasSoundOutput) {
-        const missingDevices = [
-          !hasMicrophone ? 'a microphone' : null,
-          !hasSoundOutput ? 'a sound output device' : null,
-        ].filter(Boolean);
         setDeviceCheckError(
-          `Please connect ${missingDevices.join(' and ')} before starting the mock interview.`,
+          !hasMicrophone && !hasSoundOutput
+            ? 'Microphone or speakers/headphones unavailable.'
+            : !hasMicrophone
+              ? 'Microphone unavailable.'
+              : 'Speakers or headphones unavailable.',
         );
         return;
       }
@@ -267,8 +267,8 @@ export default function App(): JSX.Element {
         (deviceError.name === 'NotAllowedError' || deviceError.name === 'SecurityError');
       setDeviceCheckError(
         permissionDenied
-          ? 'Microphone access is required. Please allow access and try again.'
-          : 'No working microphone was found. Please connect one and try again.',
+          ? 'Microphone unavailable.'
+          : 'Microphone unavailable.',
       );
       return;
     } finally {

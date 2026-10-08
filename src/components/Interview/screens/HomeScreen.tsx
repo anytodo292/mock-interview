@@ -67,7 +67,8 @@ export function HomeScreen({
   );
   const [assetsReady, setAssetsReady] = useState(false);
   const [assetLoadFailed, setAssetLoadFailed] = useState(false);
-  
+  const [permissionRequestError, setPermissionRequestError] = useState<string | null>(null);
+
   const selectedInterviewer = getInterviewerInfo(selectedInterviewerIdx);
   const interviewTypeLabel =
     InterviewTypeList.find((item) => item.id === scenario)?.text ?? 'Interview';
@@ -125,6 +126,20 @@ export function HomeScreen({
   const handleMockInterviewStartClick = (): void => {
     if (!assetsReady) return;
     onStart({ scenario, language, difficulty, interviewerIndex: selectedInterviewerIdx });
+  };
+
+  const requestMicrophonePermission = async (): Promise<void> => {
+    setPermissionRequestError(null);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      onDismissDeviceCheckError?.();
+    } catch {
+      setPermissionRequestError(
+        'Permission is still blocked. Use the permissions icon in the address bar.',
+      );
+    }
   };
 
   return (
@@ -296,7 +311,18 @@ export function HomeScreen({
             aria-describedby="device-alert-message"
           >
             <h2 id="device-alert-title">Device check</h2>
-            <p id="device-alert-message">{deviceCheckError}</p>
+            <p id="device-alert-message">
+              {deviceCheckError} Check the device connection and review{' '}
+              <button
+                type="button"
+                className="device-alert__settings-link"
+                onClick={() => requestMicrophonePermission()}
+              >
+                site settings
+              </button>
+              , then try again.
+            </p>
+            {permissionRequestError && <p role="status">{permissionRequestError}</p>}
             <button
               type="button"
               className="primary-button"

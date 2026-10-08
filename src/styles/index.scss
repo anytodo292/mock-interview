@@ -169,6 +169,14 @@ button {
 }
 .screen--dark {
   color: #fbfcff;
+  background:
+    radial-gradient(circle at 74% 18%, #102a34 0, transparent 34%),
+    #071016;
+  border: 1px solid #18313a;
+  box-shadow:
+    0 30px 80px #00000073,
+    0 8px 24px #00000040,
+    inset 0 1px #ffffff0a;
 }
 .topbar {
   height: 78px;
@@ -2033,11 +2041,13 @@ button {
     }
   }
 
-  .screen--light {
+  .screen--dark {
     color: #eaf7f6;
-    background: radial-gradient(circle at 15% 15%, #102a32 0, transparent 28%), #071016;
+    background:
+      radial-gradient(circle at 74% 18%, #102a34 0, transparent 34%),
+      #071016;
   }
-  .screen--light h1 {
+  .screen--dark h1 {
     color: #eaf7f6;  
   }
 
