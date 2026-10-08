@@ -631,6 +631,12 @@ button {
   line-height: 1.55;
 }
 
+.device-alert__dialog .device-alert__permission-error {
+  color: #c62828;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .device-alert__dialog .primary-button {
   width: 100%;
 }
@@ -2148,6 +2154,10 @@ button {
 
   .device-alert__dialog p {
     color: #92a9ae;
+  }
+
+  .device-alert__dialog .device-alert__permission-error {
+    color: #ff8a80;
   }
 
   .device-alert__settings-link {
