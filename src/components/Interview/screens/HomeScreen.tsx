@@ -14,6 +14,7 @@ import {
   InterviewerInfo,
 } from '@/constants';
 import { IInterview } from '@/types';
+import { preloadImages } from '@/utils/image';
 
 interface HomeScreenProps {
   onStart: (params: MockInterviewParams) => void;
@@ -64,6 +65,9 @@ export function HomeScreen({
   const [difficulty, setDifficulty] = useState<number>(
     initialParams?.difficulty ?? DifficultyType.Senior,
   );
+  const [assetsReady, setAssetsReady] = useState(false);
+  const [assetLoadFailed, setAssetLoadFailed] = useState(false);
+  
   const selectedInterviewer = getInterviewerInfo(selectedInterviewerIdx);
   const interviewTypeLabel =
     InterviewTypeList.find((item) => item.id === scenario)?.text ?? 'Interview';
@@ -78,6 +82,28 @@ export function HomeScreen({
       inline: 'center',
     });
   }, [selectedInterviewerIdx]);
+  
+  useEffect(() => {
+    let cancelled = false;
+    setAssetsReady(false);
+    setAssetLoadFailed(false);
+
+    void preloadImages([
+      selectedInterviewer.anim_speak,
+      selectedInterviewer.anim_listen,
+    ]).then(
+      () => {
+        if (!cancelled) setAssetsReady(true);
+      },
+      () => {
+        if (!cancelled) setAssetLoadFailed(true);
+      },
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedInterviewer.anim_listen, selectedInterviewer.anim_speak]);
 
   useEffect(() => {
     if (!deviceCheckError || !onDismissDeviceCheckError) return;
@@ -97,6 +123,7 @@ export function HomeScreen({
   };
 
   const handleMockInterviewStartClick = (): void => {
+    if (!assetsReady) return;
     onStart({ scenario, language, difficulty, interviewerIndex: selectedInterviewerIdx });
   };
 
@@ -239,8 +266,17 @@ export function HomeScreen({
             </label>
           </div> */}
 
-          <button className="primary-button" onClick={handleMockInterviewStartClick}>
-            Start mock interview
+          <button
+            className="primary-button"
+            disabled={!assetsReady}
+            onClick={handleMockInterviewStartClick}
+          >
+            {assetLoadFailed
+              ? 'Unable to prepare interviewer'
+              : assetsReady
+                ? 'Start mock interview'
+                : 'Preparing...'
+            }
           </button>
         </div>
       </div>
