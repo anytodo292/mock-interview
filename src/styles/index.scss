@@ -241,6 +241,12 @@ button {
   transform: translateY(-2px);
   box-shadow: 0 15px 30px #6240f255;
 }
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
 .primary-button span,
 .answer-button span {
   float: right;
