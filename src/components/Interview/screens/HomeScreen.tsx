@@ -322,7 +322,11 @@ export function HomeScreen({
               </button>
               , then try again.
             </p>
-            {permissionRequestError && <p role="status">{permissionRequestError}</p>}
+            {permissionRequestError && (
+              <p className="device-alert__permission-error" role="status">
+                {permissionRequestError}
+              </p>
+            )}
             <button
               type="button"
               className="primary-button"
