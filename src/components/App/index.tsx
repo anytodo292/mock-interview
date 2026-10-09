@@ -398,6 +398,9 @@ export default function App(): JSX.Element {
         initialParams={extensionParams ?? undefined}
         lockInterview={fromExtension}
         deviceCheckError={deviceCheckError}
+        showSiteSettingsHelp={Boolean(
+          deviceCheckError && !deviceCheckError.toLowerCase().includes('muted'),
+        )}
         onDismissDeviceCheckError={() => setDeviceCheckError(null)}
       />
     ),

@@ -22,6 +22,7 @@ interface HomeScreenProps {
   lockInterview?: boolean;
   interviewInfo?: IInterview;
   deviceCheckError?: string | null;
+  showSiteSettingsHelp?: boolean;
   onDismissDeviceCheckError?: () => void;
 }
 
@@ -53,6 +54,7 @@ export function HomeScreen({
   initialParams,
   interviewInfo,
   deviceCheckError,
+  showSiteSettingsHelp = false,
   onDismissDeviceCheckError,
 }: HomeScreenProps): JSX.Element {
   const scenario = initialParams?.scenario ?? InterviewType.TECH_INTERVIEW;
@@ -312,15 +314,20 @@ export function HomeScreen({
           >
             <h2 id="device-alert-title">Device check</h2>
             <p id="device-alert-message">
-              {deviceCheckError} Check the device connection and review{' '}
-              <button
-                type="button"
-                className="device-alert__settings-link"
-                onClick={() => requestMicrophonePermission()}
-              >
-                site settings
-              </button>
-              , then try again.
+              {deviceCheckError}
+              {showSiteSettingsHelp && (
+                <>
+                  Check the device connection and review{' '}
+                  <button
+                    type="button"
+                    className="device-alert__settings-link"
+                    onClick={() => requestMicrophonePermission()}
+                  >
+                    site settings
+                  </button>
+                  , then try again.
+                </>
+              )}
             </p>
             {permissionRequestError && (
               <p className="device-alert__permission-error" role="status">
