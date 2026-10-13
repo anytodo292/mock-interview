@@ -14,7 +14,7 @@ import {
 } from '../services/deepgramApi';
 import { InterviewStartParams, InterviewTranscript } from '../components/Interview/types';
 import { startAgentMicrophoneWithDevice } from '../utils/microphone';
-import { MOCK_INTERVIEW_CLOSING_PROMPT } from '../constants';
+import { MOCK_INTERVIEW_CLOSING_PROMPT, MOCK_INTERVIEW_ENDING_MESSAGE } from '../constants';
 
 export type InterviewStatus =
   'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'ended' | 'error';
@@ -50,6 +50,7 @@ interface InterviewCallbacks {
   onReady: () => void;
   onThinking: () => void;
   onAgentSpeaking: () => void;
+  onInterviewComplete: () => void;
 }
 
 interface DeepgramInterview {
@@ -108,6 +109,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const totalPausedMsRef = useRef(0);
   const startNotificationSentRef = useRef(false);
   const wrapUpPromptSentRef = useRef(false);
+  const endingMessageRequestedRef = useRef(false);
+  const endingMessageSentRef = useRef(false);
+  const completionSentRef = useRef(false);
   const connectionAttemptRef = useRef(0);
 
   callbacksRef.current = callbacks;
@@ -125,6 +129,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     pauseStartedAtRef.current = null;
     totalPausedMsRef.current = 0;
     wrapUpPromptSentRef.current = false;
+    endingMessageRequestedRef.current = false;
+    endingMessageSentRef.current = false;
+    completionSentRef.current = false;
     microphoneRef.current?.stop();
     sessionRef.current?.disconnect();
     playerRef.current?.dispose();
@@ -199,6 +206,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       transcriptIdRef.current = 0;
       startNotificationSentRef.current = false;
       wrapUpPromptSentRef.current = false;
+      endingMessageRequestedRef.current = false;
+      endingMessageSentRef.current = false;
+      completionSentRef.current = false;
       setStatus('connecting');
 
       try {
@@ -240,6 +250,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         let connectionEstablished = false;
         let initialGreetingCompleted = false;
+        let agentAudioInProgress = false;
         let resolveInitialConnection: () => void = () => undefined;
         let rejectInitialConnection: (reason: Error) => void = () => undefined;
         const initialConnectionReady = new Promise<void>((resolve, reject) => {
@@ -340,6 +351,12 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           }
         };
 
+        const injectEndingMessage = (): void => {
+          if (endingMessageSentRef.current || session.state !== 'connected') return;
+          endingMessageSentRef.current = true;
+          session.injectAgentMessage(MOCK_INTERVIEW_ENDING_MESSAGE);
+        };
+
         const waitForPlaybackToFinish = (): void => {
           stopPlaybackMonitor();
 
@@ -351,6 +368,15 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
             playbackMonitorRef.current = null;
             setAgentSpeaking(false);
+            if (endingMessageRequestedRef.current && !endingMessageSentRef.current) {
+              injectEndingMessage();
+              return;
+            }
+            if (endingMessageSentRef.current && !completionSentRef.current) {
+              completionSentRef.current = true;
+              callbacksRef.current.onInterviewComplete();
+              return;
+            }
             if (!initialGreetingCompleted) {
               initialGreetingCompleted = true;
               if (!mutedRef.current && !pausedRef.current) {
@@ -367,6 +393,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
         session.on('audio', (chunk) => {
           if (!isCurrentAttempt()) return;
+          agentAudioInProgress = true;
           player.queue(decodeMuLaw(chunk));
 
           // pre-buffering-anthony
@@ -411,7 +438,18 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
                 session.updatePrompt(MOCK_INTERVIEW_CLOSING_PROMPT);
               }
 
-              setElapsedSeconds(activeSeconds);
+              if (
+                activeSeconds >= agentBuild.durationSeconds &&
+                !endingMessageRequestedRef.current &&
+                session.state === 'connected'
+              ) {
+                endingMessageRequestedRef.current = true;
+                microphone.mute();
+                setUserSpeaking(false);
+                if (!agentAudioInProgress) injectEndingMessage();
+              }
+
+              setElapsedSeconds(Math.min(activeSeconds, agentBuild.durationSeconds));
             }, 250);
           }
           setStatus('listening');
@@ -459,6 +497,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('agent-started-speaking', () => {
           if (!isCurrentAttempt()) return;
+          agentAudioInProgress = true;
           // pre-buffering-anthony
           // microphone.mute();
           // pre-buffering-anthony
@@ -469,7 +508,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           callbacksRef.current.onAgentSpeaking();
         });
         session.on('agent-audio-done', () => {
-          if (isCurrentAttempt()) waitForPlaybackToFinish();
+          if (!isCurrentAttempt()) return;
+          agentAudioInProgress = false;
+          waitForPlaybackToFinish();
 
           // pre-buffering-anthony
           // if (!isCurrentAttempt()) return;

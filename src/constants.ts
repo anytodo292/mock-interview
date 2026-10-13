@@ -42,6 +42,8 @@ export const DifficultyType = {
 
 export const MOCK_INTERVIEW_CLOSING_PROMPT =
   'The interview is nearly finished. Stop introducing new topics, ask for any final questions, and close professionally.';
+export const MOCK_INTERVIEW_ENDING_MESSAGE =
+  'Thank you for your time today. This concludes the interview. We appreciate your thoughtful responses and wish you the best.';
 
 export const InterviewStatusType = {
   Ready: 0,

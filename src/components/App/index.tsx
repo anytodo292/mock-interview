@@ -62,6 +62,7 @@ export default function App(): JSX.Element {
   const [extensionInstalled, setExtensionInstalled] = useState<boolean | null>(
     fromExtension ? null : true,
   );
+  const [interviewCompletionSignal, setInterviewCompletionSignal] = useState(0);
 
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = window.localStorage.getItem('ntro-theme');
@@ -72,6 +73,7 @@ export default function App(): JSX.Element {
     onReady: () => setScreen('live'),
     onThinking: () => setScreen('thinking'),
     onAgentSpeaking: () => setScreen('live'),
+    onInterviewComplete: () => setInterviewCompletionSignal((signal) => signal + 1),
   });
   const transcriptRef = useRef<InterviewTranscript[]>([]);
   const lastUploadedIndexRef = useRef(0);
@@ -334,20 +336,12 @@ export default function App(): JSX.Element {
   };
 
   useEffect(() => {
-    const interviewIsActive = screen === 'live' || screen === 'thinking';
-    if (
-      !interviewIsActive ||
-      interview.durationSeconds === null ||
-      interview.elapsedSeconds < interview.durationSeconds
-    )
-      return;
-
-    const maximumMinutes = interview.durationSeconds / 60;
+    if (interviewCompletionSignal === 0) return;
     setCompletionMessage(
-      `The ${maximumMinutes}-minute interview limit was reached. Your session was ended automatically and your responses are being saved.`,
+      'The interview time limit was reached. Your session was ended automatically and your responses are being saved.',
     );
     endInterview();
-  }, [interview.durationSeconds, interview.elapsedSeconds, screen]);
+  }, [interviewCompletionSignal]);
 
   const restartInterview = (): void => {
     interview.reset();
