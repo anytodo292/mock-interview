@@ -112,11 +112,13 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const wrapUpPromptSentRef = useRef(false);
   const endingMessageRequestedRef = useRef(false);
   const endingMessageSentRef = useRef(false);
+  const endingTranscriptReceivedRef = useRef(false);
+  const endingAudioStartedRef = useRef(false);
+  const endingAudioDoneRef = useRef(false);
   const completionSentRef = useRef(false);
   const closingSecondsRef = useRef(0);
   const connectionAttemptRef = useRef(0);
   const endingInjectionTimeoutRef = useRef<number | null>(null);
-  const endingCompletionTimeoutRef = useRef<number | null>(null);
 
   callbacksRef.current = callbacks;
 
@@ -129,10 +131,6 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       window.clearInterval(elapsedTimerRef.current);
       elapsedTimerRef.current = null;
     }
-    if (endingCompletionTimeoutRef.current !== null) {
-      window.clearTimeout(endingCompletionTimeoutRef.current);
-      endingCompletionTimeoutRef.current = null;
-    }
     if (endingInjectionTimeoutRef.current !== null) {
       window.clearTimeout(endingInjectionTimeoutRef.current);
       endingInjectionTimeoutRef.current = null;
@@ -143,6 +141,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     wrapUpPromptSentRef.current = false;
     endingMessageRequestedRef.current = false;
     endingMessageSentRef.current = false;
+    endingTranscriptReceivedRef.current = false;
+    endingAudioStartedRef.current = false;
+    endingAudioDoneRef.current = false;
     completionSentRef.current = false;
     userSpeakingRef.current = false;
     microphoneRef.current?.stop();
@@ -222,6 +223,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       wrapUpPromptSentRef.current = false;
       endingMessageRequestedRef.current = false;
       endingMessageSentRef.current = false;
+      endingTranscriptReceivedRef.current = false;
+      endingAudioStartedRef.current = false;
+      endingAudioDoneRef.current = false;
       completionSentRef.current = false;
       setStatus('connecting');
 
@@ -373,7 +377,6 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           if (
             endingMessageSentRef.current ||
             (agentAudioInProgress && !force) ||
-            (!force && userSpeakingRef.current) ||
             session.state !== 'connected'
           )
             return;
@@ -383,19 +386,17 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
             agentAudioInProgress = false;
             setAgentSpeaking(false);
           }
-          userSpeakingRef.current = false;
-          setUserSpeaking(false);
           if (endingInjectionTimeoutRef.current !== null) {
             window.clearTimeout(endingInjectionTimeoutRef.current);
             endingInjectionTimeoutRef.current = null;
           }
+          userSpeakingRef.current = false;
+          setUserSpeaking(false);
           endingMessageSentRef.current = true;
-          session.injectAgentMessage(MOCK_INTERVIEW_ENDING_MESSAGE);
-          endingCompletionTimeoutRef.current = window.setTimeout(() => {
-            if (completionSentRef.current || !isCurrentAttempt()) return;
-            completionSentRef.current = true;
-            callbacksRef.current.onInterviewComplete();
-          }, 20_000);
+          endingTranscriptReceivedRef.current = false;
+          endingAudioStartedRef.current = false;
+          endingAudioDoneRef.current = false;
+          session.injectAgentMessage(MOCK_INTERVIEW_ENDING_MESSAGE);          
         };
 
         const waitForPlaybackToFinish = (): void => {
@@ -413,7 +414,13 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
               injectEndingMessage();
               return;
             }
-            if (endingMessageSentRef.current && !completionSentRef.current) {
+            if (
+              endingMessageSentRef.current &&
+              endingTranscriptReceivedRef.current &&
+              endingAudioStartedRef.current &&
+              endingAudioDoneRef.current &&
+              !completionSentRef.current
+            ) {
               completionSentRef.current = true;
               callbacksRef.current.onInterviewComplete();
               return;
@@ -435,6 +442,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         session.on('audio', (chunk) => {
           if (!isCurrentAttempt()) return;
           agentAudioInProgress = true;
+          if (endingMessageSentRef.current) {
+            endingAudioStartedRef.current = true;
+          }
           player.queue(decodeMuLaw(chunk));
 
           // pre-buffering-anthony
@@ -509,7 +519,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
           const role = message.role === 'agent' ? 'assistant' : message.role;
           if (role !== 'user' && role !== 'assistant') return;
-
+          if (role === 'assistant' && content === MOCK_INTERVIEW_ENDING_MESSAGE) {
+            endingTranscriptReceivedRef.current = true;
+          }
           transcriptIdRef.current += 1;
           setTranscriptList((prevList) => [
             ...prevList,
@@ -547,6 +559,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         session.on('agent-started-speaking', () => {
           if (!isCurrentAttempt()) return;
           agentAudioInProgress = true;
+          if (endingMessageSentRef.current) {
+            endingAudioStartedRef.current = true;
+          }
           // pre-buffering-anthony
           // microphone.mute();
           // pre-buffering-anthony
@@ -559,6 +574,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         session.on('agent-audio-done', () => {
           if (!isCurrentAttempt()) return;
           agentAudioInProgress = false;
+          if (endingAudioStartedRef.current) endingAudioDoneRef.current = true;
           waitForPlaybackToFinish();
 
           // pre-buffering-anthony
