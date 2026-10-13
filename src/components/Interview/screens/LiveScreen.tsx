@@ -16,6 +16,7 @@ interface LiveScreenProps {
   agentSpeaking: boolean;
   userSpeaking: boolean;
   elapsedSeconds: number;
+  durationSeconds: number | null;
   controlsDisabled?: boolean;
   runtimeError?: boolean;
   agentMessage?: string;
@@ -32,6 +33,7 @@ export function LiveScreen({
   agentSpeaking,
   userSpeaking,
   elapsedSeconds,
+  durationSeconds,
   controlsDisabled = false,
   runtimeError = false,
   agentMessage,
@@ -55,6 +57,7 @@ export function LiveScreen({
             interviewer={interviewer}
             interviewInfo={interviewInfo}
             elapsedSeconds={elapsedSeconds}
+            durationSeconds={durationSeconds}
           />
           <div className="video-frame">
             <SpeakingPortrait

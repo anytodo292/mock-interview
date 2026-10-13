@@ -11,6 +11,7 @@ interface ThinkingScreenProps {
   interviewer: Interviewer;
   interviewInfo?: IInterview;
   elapsedSeconds: number;
+  durationSeconds: number | null;
   controlsDisabled?: boolean;
   onEnd: () => void;
   muted: boolean;
@@ -23,6 +24,7 @@ export function ThinkingScreen({
   interviewer,
   interviewInfo,
   elapsedSeconds,
+  durationSeconds,
   controlsDisabled = false,
   onEnd,
   muted,
@@ -43,6 +45,7 @@ export function ThinkingScreen({
             interviewer={interviewer}
             interviewInfo={interviewInfo}
             elapsedSeconds={elapsedSeconds}
+            durationSeconds={durationSeconds}
           />
           <div className="video-frame video-frame--thinking">
             <img src={interviewer.image} alt={`${interviewer.name} considering the answer`} />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Interviewer, MOCK_INTERVIEW_DURATION_SECONDS } from '@/constants';
+import { Interviewer } from '@/constants';
 import { IInterview } from '@/types';
 
 const waveHeights = [
@@ -69,10 +69,12 @@ export function InterviewerIdentity({
   interviewer,
   interviewInfo,
   elapsedSeconds = 0,
+  durationSeconds,
 }: {
   interviewer: Interviewer;
   interviewInfo?: IInterview;
   elapsedSeconds?: number;
+  durationSeconds: number | null;
 }): JSX.Element {
   const formatTime = (totalSeconds: number): string => {
     const hours = Math.floor(totalSeconds / 3600);
@@ -83,8 +85,10 @@ export function InterviewerIdentity({
       .map((value) => value.toString().padStart(2, '0'))
       .join(':');
   };
-  const elapsedTime = formatTime(Math.min(elapsedSeconds, MOCK_INTERVIEW_DURATION_SECONDS));
-  const maximumTime = formatTime(MOCK_INTERVIEW_DURATION_SECONDS);
+  const elapsedTime = formatTime(
+    durationSeconds === null ? elapsedSeconds : Math.min(elapsedSeconds, durationSeconds),
+  );
+  const maximumTime = durationSeconds === null ? '--:--' : formatTime(durationSeconds);
 
   return (
     <div className="identity">

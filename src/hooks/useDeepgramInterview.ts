@@ -14,7 +14,7 @@ import {
 } from '../services/deepgramApi';
 import { InterviewStartParams, InterviewTranscript } from '../components/Interview/types';
 import { startAgentMicrophoneWithDevice } from '../utils/microphone';
-import { MOCK_INTERVIEW_CLOSING_PROMPT, MOCK_INTERVIEW_CLOSING_SECONDS } from '../constants';
+import { MOCK_INTERVIEW_CLOSING_PROMPT } from '../constants';
 
 export type InterviewStatus =
   'idle' | 'connecting' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'ended' | 'error';
@@ -59,6 +59,7 @@ interface DeepgramInterview {
   agentSpeaking: boolean;
   userSpeaking: boolean;
   elapsedSeconds: number;
+  durationSeconds: number | null;
   sessionId: string | null;
   error: string | null;
   transcriptList: InterviewTranscript[];
@@ -85,6 +86,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const [agentSpeaking, setAgentSpeaking] = useState(false);
   const [userSpeaking, setUserSpeaking] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [durationSeconds, setDurationSeconds] = useState<number | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [transcriptList, setTranscriptList] = useState<InterviewTranscript[]>([]);
@@ -140,6 +142,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setAgentSpeaking(false);
     setUserSpeaking(false);
     setElapsedSeconds(0);
+    setDurationSeconds(null);
     setConnectionRetryCount(0);
     mutedRef.current = false;
     pausedRef.current = false;
@@ -157,6 +160,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setAgentSpeaking(false);
     setUserSpeaking(false);
     setElapsedSeconds(0);
+    setDurationSeconds(null);
     setConnectionRetryCount(0);
     setSessionId(null);
     setError(null);
@@ -186,6 +190,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       setAgentSpeaking(false);
       setUserSpeaking(false);
       setElapsedSeconds(0);
+      setDurationSeconds(null);
       setConnectionRetryCount(0);
       setSessionId(clientSessionId);
       mutedRef.current = false;
@@ -200,6 +205,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         const extensionToken = await fetchDeepgramToken();
         const agentBuild = await fetchAgentBuild(params, interviewId);
         if (!isCurrentAttempt()) return;
+        setDurationSeconds(agentBuild.durationSeconds);
         const inputSampleRate = agentBuild.audio?.input?.sampleRate ?? 16_000;
         const outputSampleRate = OPTIMIZED_OUTPUT_SAMPLE_RATE;
         const optimizedAudio = {
@@ -397,7 +403,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
               const activeSeconds = Math.max(0, Math.floor(activeMs / 1000));
 
               if (
-                activeSeconds >= MOCK_INTERVIEW_CLOSING_SECONDS &&
+                activeSeconds >= agentBuild.closingSeconds &&
                 !wrapUpPromptSentRef.current &&
                 session.state === 'connected'
               ) {
@@ -580,6 +586,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     agentSpeaking,
     userSpeaking,
     elapsedSeconds,
+    durationSeconds,
     sessionId,
     error,
     transcriptList,

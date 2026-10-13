@@ -40,9 +40,6 @@ export const DifficultyType = {
   Senior: 2,
 };
 
-// Change this value to adjust the maximum active interview duration.
-export const MOCK_INTERVIEW_DURATION_SECONDS = 20 * 60;
-export const MOCK_INTERVIEW_CLOSING_SECONDS = 18 * 60;
 export const MOCK_INTERVIEW_CLOSING_PROMPT =
   'The interview is nearly finished. Stop introducing new topics, ask for any final questions, and close professionally.';
 

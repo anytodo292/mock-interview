@@ -20,6 +20,8 @@ const INTERVIEW_STATUS_COOKIE = '__Secure_1NTMIS';
 
 export interface AgentBuildConfig {
   agent: AgentSettingsObject | string;
+  durationSeconds: number;
+  closingSeconds: number;
   audio?: AgentSessionConfig['audio'];
   tags?: string[];
   experimental?: boolean;
@@ -131,10 +133,23 @@ export async function fetchAgentBuild(
   if (data.code < 0) throw new Error(String(data.msg));
 
   const build = data.msg;
-  if (typeof build === 'string') return { agent: normalizeAgent(build) };
   if (isObject(build) && build.agent !== undefined) {
+    const durationSeconds = toNumber(build.duration_seconds);
+    const closingSeconds = toNumber(build.closing_seconds);
+    if (
+      durationSeconds === null ||
+      durationSeconds <= 0 ||
+      closingSeconds === null ||
+      closingSeconds < 0 ||
+      closingSeconds > durationSeconds
+    ) {
+      throw new Error('The agent build does not contain valid interview timing settings.');
+    }
+
     return {
       agent: normalizeAgent(build.agent),
+      durationSeconds,
+      closingSeconds,
       audio: build.audio as AgentSessionConfig['audio'],
       tags: Array.isArray(build.tags)
         ? build.tags.filter((tag): tag is string => typeof tag === 'string')
@@ -142,9 +157,8 @@ export async function fetchAgentBuild(
       experimental: typeof build.experimental === 'boolean' ? build.experimental : undefined,
     };
   }
-  if (isObject(build)) return { agent: normalizeAgent(build) };
 
-  throw new Error('The agent build endpoint did not return an agent ID or configuration.');
+  throw new Error('The agent build endpoint did not return a valid agent configuration.');
 }
 
 export async function fetchInterview(

@@ -24,7 +24,6 @@ import {
   getInterviewerInfo,
   InterviewStatusType,
   LangType,
-  MOCK_INTERVIEW_DURATION_SECONDS,
 } from '@/constants';
 import {
   fetchEvaluation,
@@ -336,14 +335,19 @@ export default function App(): JSX.Element {
 
   useEffect(() => {
     const interviewIsActive = screen === 'live' || screen === 'thinking';
-    if (!interviewIsActive || interview.elapsedSeconds < MOCK_INTERVIEW_DURATION_SECONDS) return;
+    if (
+      !interviewIsActive ||
+      interview.durationSeconds === null ||
+      interview.elapsedSeconds < interview.durationSeconds
+    )
+      return;
 
-    const maximumMinutes = MOCK_INTERVIEW_DURATION_SECONDS / 60;
+    const maximumMinutes = interview.durationSeconds / 60;
     setCompletionMessage(
       `The ${maximumMinutes}-minute interview limit was reached. Your session was ended automatically and your responses are being saved.`,
     );
     endInterview();
-  }, [interview.elapsedSeconds, screen]);
+  }, [interview.durationSeconds, interview.elapsedSeconds, screen]);
 
   const restartInterview = (): void => {
     interview.reset();
@@ -421,6 +425,7 @@ export default function App(): JSX.Element {
         agentSpeaking={interview.agentSpeaking}
         userSpeaking={interview.userSpeaking}
         elapsedSeconds={interview.elapsedSeconds}
+        durationSeconds={interview.durationSeconds}
         controlsDisabled={interview.status === 'error'}
         runtimeError={interview.status === 'error'}
         agentMessage={latestAgentMessage}
@@ -433,6 +438,7 @@ export default function App(): JSX.Element {
         interviewer={interviewer}
         interviewInfo={interviewInfo}
         elapsedSeconds={interview.elapsedSeconds}
+        durationSeconds={interview.durationSeconds}
         controlsDisabled={interview.status === 'error'}
         onEnd={endInterview}
         muted={interview.muted}
