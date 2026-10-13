@@ -60,7 +60,7 @@ interface DeepgramInterview {
   agentSpeaking: boolean;
   userSpeaking: boolean;
   elapsedSeconds: number;
-  durationSeconds: number | null;
+  durationSeconds: number;
   sessionId: string | null;
   error: string | null;
   transcriptList: InterviewTranscript[];
@@ -87,7 +87,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const [agentSpeaking, setAgentSpeaking] = useState(false);
   const [userSpeaking, setUserSpeaking] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [durationSeconds, setDurationSeconds] = useState<number | null>(null);
+  const [durationSeconds, setDurationSeconds] = useState(0);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [transcriptList, setTranscriptList] = useState<InterviewTranscript[]>([]);
@@ -100,6 +100,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const intentionalEndRef = useRef(false);
   const mutedRef = useRef(false);
   const pausedRef = useRef(false);
+  const userSpeakingRef = useRef(false);
   const transcriptIdRef = useRef(0);
   const statusBeforePauseRef = useRef<InterviewStatus>('listening');
   const playbackMonitorRef = useRef<number | null>(null);
@@ -112,7 +113,10 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const endingMessageRequestedRef = useRef(false);
   const endingMessageSentRef = useRef(false);
   const completionSentRef = useRef(false);
+  const closingSecondsRef = useRef(0);
   const connectionAttemptRef = useRef(0);
+  const endingInjectionTimeoutRef = useRef<number | null>(null);
+  const endingCompletionTimeoutRef = useRef<number | null>(null);
 
   callbacksRef.current = callbacks;
 
@@ -125,6 +129,14 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       window.clearInterval(elapsedTimerRef.current);
       elapsedTimerRef.current = null;
     }
+    if (endingCompletionTimeoutRef.current !== null) {
+      window.clearTimeout(endingCompletionTimeoutRef.current);
+      endingCompletionTimeoutRef.current = null;
+    }
+    if (endingInjectionTimeoutRef.current !== null) {
+      window.clearTimeout(endingInjectionTimeoutRef.current);
+      endingInjectionTimeoutRef.current = null;
+    }
     sessionStartedAtRef.current = null;
     pauseStartedAtRef.current = null;
     totalPausedMsRef.current = 0;
@@ -132,6 +144,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     endingMessageRequestedRef.current = false;
     endingMessageSentRef.current = false;
     completionSentRef.current = false;
+    userSpeakingRef.current = false;
     microphoneRef.current?.stop();
     sessionRef.current?.disconnect();
     playerRef.current?.dispose();
@@ -149,7 +162,8 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setAgentSpeaking(false);
     setUserSpeaking(false);
     setElapsedSeconds(0);
-    setDurationSeconds(null);
+    setDurationSeconds(0);
+    closingSecondsRef.current = 0;
     setConnectionRetryCount(0);
     mutedRef.current = false;
     pausedRef.current = false;
@@ -167,7 +181,8 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     setAgentSpeaking(false);
     setUserSpeaking(false);
     setElapsedSeconds(0);
-    setDurationSeconds(null);
+    setDurationSeconds(0);
+    closingSecondsRef.current = 0;
     setConnectionRetryCount(0);
     setSessionId(null);
     setError(null);
@@ -177,7 +192,6 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
 
   const start = useCallback(
     async ({
-      msId,
       interviewId,
       microphoneDeviceId,
       ...params
@@ -197,7 +211,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
       setAgentSpeaking(false);
       setUserSpeaking(false);
       setElapsedSeconds(0);
-      setDurationSeconds(null);
+      setDurationSeconds(0);
       setConnectionRetryCount(0);
       setSessionId(clientSessionId);
       mutedRef.current = false;
@@ -215,7 +229,11 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         const extensionToken = await fetchDeepgramToken();
         const agentBuild = await fetchAgentBuild(params, interviewId);
         if (!isCurrentAttempt()) return;
+        if (agentBuild.closingSeconds >= agentBuild.durationSeconds) {
+          throw new Error('closing_seconds must be less than duration_seconds.');
+        }
         setDurationSeconds(agentBuild.durationSeconds);
+        closingSecondsRef.current = agentBuild.closingSeconds;
         const inputSampleRate = agentBuild.audio?.input?.sampleRate ?? 16_000;
         const outputSampleRate = OPTIMIZED_OUTPUT_SAMPLE_RATE;
         const optimizedAudio = {
@@ -351,10 +369,33 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           }
         };
 
-        const injectEndingMessage = (): void => {
-          if (endingMessageSentRef.current || session.state !== 'connected') return;
+        const injectEndingMessage = (force = false): void => {
+          if (
+            endingMessageSentRef.current ||
+            (agentAudioInProgress && !force) ||
+            (!force && userSpeakingRef.current) ||
+            session.state !== 'connected'
+          )
+            return;
+
+          if (force && agentAudioInProgress) {
+            player.interrupt();
+            agentAudioInProgress = false;
+            setAgentSpeaking(false);
+          }
+          userSpeakingRef.current = false;
+          setUserSpeaking(false);
+          if (endingInjectionTimeoutRef.current !== null) {
+            window.clearTimeout(endingInjectionTimeoutRef.current);
+            endingInjectionTimeoutRef.current = null;
+          }
           endingMessageSentRef.current = true;
           session.injectAgentMessage(MOCK_INTERVIEW_ENDING_MESSAGE);
+          endingCompletionTimeoutRef.current = window.setTimeout(() => {
+            if (completionSentRef.current || !isCurrentAttempt()) return;
+            completionSentRef.current = true;
+            callbacksRef.current.onInterviewComplete();
+          }, 20_000);
         };
 
         const waitForPlaybackToFinish = (): void => {
@@ -403,6 +444,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           // pre-buffering-anthony
 
           stopPlaybackMonitor();
+          userSpeakingRef.current = false;
           setAgentSpeaking(true);
           setUserSpeaking(false);
           if (!pausedRef.current) {
@@ -430,7 +472,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
               const activeSeconds = Math.max(0, Math.floor(activeMs / 1000));
 
               if (
-                activeSeconds >= agentBuild.closingSeconds &&
+                activeSeconds >= closingSecondsRef.current &&
                 !wrapUpPromptSentRef.current &&
                 session.state === 'connected'
               ) {
@@ -445,7 +487,12 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
               ) {
                 endingMessageRequestedRef.current = true;
                 microphone.mute();
+                userSpeakingRef.current = false;
                 setUserSpeaking(false);
+                endingInjectionTimeoutRef.current = window.setTimeout(
+                  () => injectEndingMessage(true),
+                  10_000,
+                );
                 if (!agentAudioInProgress) injectEndingMessage();
               }
 
@@ -477,6 +524,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         session.on('user-started-speaking', () => {
           if (!isCurrentAttempt()) return;
           if (!initialGreetingCompleted) return;
+          userSpeakingRef.current = true;
           player.interrupt();
           // pre-buffering-anthony
           // if (bufferedAudioBytes > 0 || player.getRemainingPlaybackTime() > 0.05) return;
@@ -490,6 +538,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         });
         session.on('agent-thinking', () => {
           if (!isCurrentAttempt()) return;
+          userSpeakingRef.current = false;
           setUserSpeaking(false);
           if (pausedRef.current) return;
           setStatus('thinking');
@@ -564,6 +613,7 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
         if (!isCurrentAttempt()) return;
         intentionalEndRef.current = true;
         releaseResources();
+        setDurationSeconds(0);
         setError(getErrorMessage(startError));
         setStatus('error');
         throw startError;
