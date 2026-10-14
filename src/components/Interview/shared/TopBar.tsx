@@ -6,7 +6,7 @@ function Logo(): JSX.Element {
     <a className="brand" href="https://www.ntro.io" aria-label="Visit NTRO">
       <img
         className="brand__logo"
-        src={`${__PUBLIC_URL__}/assets/images/logo.png`}
+        src={`${__ASSETS_URL__}/images/logo-meeting.png`}
         alt="NTRO Copilot"
       />
     </a>
