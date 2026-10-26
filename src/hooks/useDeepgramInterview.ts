@@ -108,6 +108,8 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
   const totalPausedMsRef = useRef(0);
   const startNotificationSentRef = useRef(false);
   const wrapUpPromptSentRef = useRef(false);
+  const wrapUpPromptAppliedRef = useRef(false);
+  const wrapUpInputGatedRef = useRef(false);
   const endingMessageRequestedRef = useRef(false);
   const endingMessageSentRef = useRef(false);
   const endingTranscriptReceivedRef = useRef(false);
@@ -148,7 +150,9 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
     sessionStartedAtRef.current = null;
     pauseStartedAtRef.current = null;
     totalPausedMsRef.current = 0;
-    wrapUpPromptSentRef.current = false;
+    wrapUpPromptSentRef.current = false;    
+    wrapUpPromptAppliedRef.current = false;
+    wrapUpInputGatedRef.current = false;
     endingMessageRequestedRef.current = false;
     endingMessageSentRef.current = false;
     endingTranscriptReceivedRef.current = false;
@@ -564,7 +568,15 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
                 session.state === 'connected'
               ) {
                 wrapUpPromptSentRef.current = true;
+                wrapUpPromptAppliedRef.current = false;
                 session.updatePrompt(MOCK_INTERVIEW_CLOSING_PROMPT);
+                // updatePrompt is asynchronous. Do not allow a fresh candidate
+                // turn to race the server's prompt-updated acknowledgement.
+                // An active candidate turn is never interrupted.
+                if (!userSpeakingRef.current && !agentThinkingInProgress) {
+                  wrapUpInputGatedRef.current = true;
+                  microphone.mute();
+                }
               }
 
               if (
@@ -595,6 +607,22 @@ export function useDeepgramInterview(callbacks: InterviewCallbacks): DeepgramInt
           }
           setStatus('listening');
           callbacksRef.current.onReady();
+        });
+        session.on('prompt-updated', () => {
+          if (!isCurrentAttempt()) return;
+          if (wrapUpPromptSentRef.current && !wrapUpPromptAppliedRef.current) {
+            wrapUpPromptAppliedRef.current = true;
+            if (wrapUpInputGatedRef.current) {
+              wrapUpInputGatedRef.current = false;
+              if (
+                !mutedRef.current &&
+                !pausedRef.current &&
+                !endingMessageRequestedRef.current
+              ) {
+                microphone.unmute();
+              }
+            }
+          }
         });
         session.on('conversation-text', (message: ConversationTextMessage) => {
           if (!isCurrentAttempt()) return;
